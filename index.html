@@ -528,16 +528,23 @@ if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Obje
    從雲端即時載入
 ===================================================== */
 
-database.ref("systemData").on("value", function(snapshot){
+database.ref("systemData").once("value", function(snapshot){
+
     if(snapshot.exists()){
         data = snapshot.val();
         safeInit();
         render();
         writeLog("☁️ 已同步最新資料");
+
     }else{
-        // 第一次初始化
-        save(); 
+
+        if(confirm("雲端沒有資料，是否建立新資料？")){
+            save();
+        }else{
+            alert("請確認資料庫內容");
+        }
     }
+
 });
 
 
@@ -1332,3 +1339,4 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
