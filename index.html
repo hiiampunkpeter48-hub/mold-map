@@ -369,7 +369,6 @@ header {
 <button onclick="doSearch()">🔍Search</button>
 <button onclick="clearHighlight()">🧹Clear</button></div>
   
-</header>
 
 <div id="board"></div>
 
@@ -555,9 +554,16 @@ function save(){
    Firebase 連線監聽
 ===================================================== */
 
+let firstConnect = true;
+
 firebase.database().ref(".info/connected")
 .on("value", function(snap){
-    if(snap.val() !== true){
+    if(firstConnect){
+        firstConnect = false;
+        return; // 忽略第一次
+    }
+
+    if(snap.val() === false){
         forceClose("與雲端失去連線");
     }
 });
