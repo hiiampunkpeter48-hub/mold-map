@@ -553,9 +553,15 @@ database.ref("systemData").once("value", function(snapshot){
 ===================================================== */
 
 function save(){
-    database.ref("systemData").set(data);
+    database.ref("systemData").set(data)
+    .then(()=>{
+        writeLog("☁️ 已同步雲端");
+        alert("已同步到雲端");
+    })
+    .catch(()=>{
+        alert("同步失敗");
+    });
 }
-
 
 /* =====================================================
    Firebase 連線監聽
@@ -1339,4 +1345,5 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
