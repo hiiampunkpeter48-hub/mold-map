@@ -376,10 +376,10 @@ header {
 <div id="floatingBtn">☰</div>
 
 <div id="floatingMenu" class="floatingMenu hidden">
-  <button onclick="scrollTopPage()">⬆ Run to the top</button>
-  <button onclick="openRoomSelector()">🏭 choose Robots</button>
-  <button onclick="openBoxSelector()">📦 choose Boxes</button>
-  <button onclick="scrollBottomPage()">⬇ Run to the bottom</button>
+  <button onclick="scrollTopPage()">⬆ run to the top</button>
+  <button onclick="openRoomSelector()">🏭 choose rooms</button>
+  <button onclick="openBoxSelector()">📦 choose boxes</button>
+  <button onclick="scrollBottomPage()">⬇ run to the bottom</button>
 </div>
 
 <div class="adminBar">
@@ -573,6 +573,29 @@ firebase.database().ref(".info/connected")
 /* =====================================================
    核心功能區
 ===================================================== */
+// 安全版本：治具顏色跟隨
+(function(){
+  function updateFruitColors() {
+    Object.keys(data.locations).forEach(locKey => {
+      const fruit = data.locations[locKey];
+      const cellDiv = document.getElementById(`cell-${locKey}`);
+      if (!cellDiv) return;
+
+      if (fruit) {
+        cellDiv.classList.add('hasFruit'); // 有治具
+      } else {
+        cellDiv.classList.remove('hasFruit'); // 無治具
+      }
+    });
+  }
+
+  const originalRender = render;
+  render = function() {
+    originalRender();
+    updateFruitColors();
+  };
+})();
+
 // 📌 圖片放大功能 -->
 function zoomImage(img) {
   const overlay = document.createElement('div');
@@ -857,14 +880,14 @@ function createSelector(title, items, prefixText) {
   document.body.appendChild(overlay);
 }
 
-// ===== Robots 選單 =====
+// ===== rooms 選單 =====
 function openRoomSelector(){
-  createSelector("選取 Robots", data.roomOrder, "機台 ");
+  createSelector("選取 rooms", data.roomOrder, "機台 ");
 }
 
-// ===== Boxes 選單 =====
+// ===== bxes 選單 =====
 function openBoxSelector(){
-  createSelector("選取 Boxes", data.boxOrder, "治具架 ");
+  createSelector("選取 boxes", data.boxOrder, "治具架 ");
 }
 
 /* Console=btoa('abc789') */
