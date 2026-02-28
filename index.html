@@ -1158,20 +1158,26 @@ function requireLogin(){
   return true;
 }
 
+// 再點一次自己 → 取消選取
 function select(loc){
   if(!requireLogin()) return;
   const fruit = data.locations[loc];
+// 再點一次自己 → 取消選取
   if(selected===loc){ selected=null; hasMoved=false; render(); return; }
+// 第一次點 → 變黃色
   if(!selected){ selected=loc; hasMoved=false; render(); return; }
+// 已移動過 → 清除選取
   if(hasMoved){ selected=null; hasMoved=false; render(); return; }
-
+// 第二次點不同格 → 執行交換
   if(selected!==loc){
     const a=data.locations[selected], b=data.locations[loc];
     if(a) removeDuplicateFruit(a, loc);
     if(b) removeDuplicateFruit(b, selected);
+// ⭐⭐⭐ 這裡就是移動 ⭐⭐⭐
     data.locations[selected]=b;
     data.locations[loc]=a;
     const operator = isAdmin ? '管理員' : currentUser;
+// ⭐⭐⭐ 這裡就是寫 log ⭐⭐⭐
     data.log.unshift(`${new Date().toLocaleString()} | ${selected} → ${loc} | ${a||'無治具'} | 操作者: ${operator}`);
     save();
     selected = loc;
