@@ -326,9 +326,7 @@ header {
 <div class="topImageGroup">
   <div class="imageRow">
 <!-- 省略 -->
-<!-- 此處為base64圖檔 -->
-
-<!-- 此處為base64圖檔 -->
+ <!-- 此處為base64圖檔 -->
 <!-- 省略 -->
   </div>
   <div class="imageHint">👆👆คลิกเพื่อขยายภาพ_Nhấp chuột để phóng to hình ảnh</div>
@@ -367,6 +365,7 @@ header {
 <button onclick="doSearch()">🔍Search</button>
 <button onclick="clearHighlight()">🧹Clear</button></div>
   
+</header>
 
 <div id="board"></div>
 
@@ -526,23 +525,16 @@ if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Obje
    從雲端即時載入
 ===================================================== */
 
-database.ref("systemData").once("value").then(snapshot => {
-
+database.ref("systemData").on("value", function(snapshot){
     if(snapshot.exists()){
-
-        const cloudData = snapshot.val();
-
-        data = {
-            ...data,        // 保留本地預設結構
-            ...cloudData    // 用雲端覆蓋已有欄位
-        };
-
+        data = snapshot.val();
+        safeInit();
         render();
-
+        writeLog("☁️ 已同步最新資料");
     }else{
-        save();
+        // 第一次初始化
+        save(); 
     }
-
 });
 
 
@@ -551,29 +543,17 @@ database.ref("systemData").once("value").then(snapshot => {
 ===================================================== */
 
 function save(){
-  return database.ref("systemData").set(data)
-  .then(()=>{
-      console.log("☁️ 同步成功");
-  })
-  .catch(err=>{
-      console.error(err);
-  });
+    database.ref("systemData").set(data);
 }
+
 
 /* =====================================================
    Firebase 連線監聽
 ===================================================== */
 
-let firstConnect = true;
-
 firebase.database().ref(".info/connected")
 .on("value", function(snap){
-    if(firstConnect){
-        firstConnect = false;
-        return; // 忽略第一次
-    }
-
-    if(snap.val() === false){
+    if(snap.val() !== true){
         forceClose("與雲端失去連線");
     }
 });
@@ -1046,50 +1026,55 @@ function exportLayout() {
 function importLayout() {
   if (!isAdmin) return alert('請先登入管理員');
 
-  reader.onload = e => {
-  let imported;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
 
-  try {
-    imported = JSON.parse(e.target.result);
-  } catch (err) {
-    alert('JSON 解析失敗: ' + err.message);
-    return;
-  }
+  input.onchange = () => {
+    const file = input.files[0];
+    if (!file) return;
 
-  if (!confirm('匯入會覆蓋目前所有治具位置，確定繼續？')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const imported = JSON.parse(e.target.result);
 
-  try {
+        if (!confirm('匯入會覆蓋目前所有治具位置，確定繼續？')) return;
 
-    safeInit();
+        // ⭐ 先確保位置完整
+        safeInit();
 
-    Object.keys(data.locations).forEach(k => data.locations[k] = null);
-    data.fruits = [];
+        // ⭐ 清空所有治具
+        Object.keys(data.locations).forEach(k => data.locations[k] = null);
+        data.fruits = [];
 
-    Object.entries(imported).forEach(([loc, fruit]) => {
-      data.locations[loc] = fruit;
+        // ⭐ 依匯入資料還原
+        Object.entries(imported).forEach(([loc, fruit]) => {
+          if (loc in data.locations) {
+            data.locations[loc] = fruit;
+            if (!data.fruits.includes(fruit)) {
+              data.fruits.push(fruit);
+            }
+          }
+        });
 
-      if (!data.fruits.includes(fruit)) {
-        data.fruits.push(fruit);
-      }
-    });
+        data.log.unshift(
+          `${new Date().toLocaleString()} | 匯入治具分布位置 | 操作者: 管理員`
+        );
 
-    data.log.unshift(
-      `${new Date().toLocaleString()} | 匯入治具分布位置 | 操作者: ${currentUser || '管理員'}`
-    );
-
-    save()
-      .then(() => {
+        save();
         render();
-        alert('☁️ 匯入完成，已同步至雲端');
-      })
-      .catch(err => {
-        alert('❌ 雲端同步失敗: ' + err.message);
-      });
+        alert('治具分布位置匯入完成');
 
-  } catch (err) {
-    console.error(err);
-    alert('匯入流程錯誤: ' + err.message);
-  }
+      } catch (err) {
+        alert('檔案格式錯誤，請確認為正確的 JSON');
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  input.click();
 }
 
 /* ====== 匯出 dropdown 治具 KEY ====== */
@@ -1337,6 +1322,3 @@ function updateData(callback){
 </script>
 </body>
 </html>
-
-
-
