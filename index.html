@@ -1042,7 +1042,7 @@ function exportLayout() {
   URL.revokeObjectURL(a.href);
 }
 
-/* ====== 匯入治具分布位置 ====== */
+/* ====== 匯入治具分布位置（雲端同步版） ====== */
 function importLayout() {
   if (!isAdmin) return alert('請先登入管理員');
 
@@ -1061,14 +1061,13 @@ function importLayout() {
 
         if (!confirm('匯入會覆蓋目前所有治具位置，確定繼續？')) return;
 
-        // ⭐ 先確保位置完整
         safeInit();
 
-        // ⭐ 清空所有治具
+        // ===== 清空 =====
         Object.keys(data.locations).forEach(k => data.locations[k] = null);
         data.fruits = [];
 
-        // ⭐ 依匯入資料還原
+        // ===== 還原 =====
         Object.entries(imported).forEach(([loc, fruit]) => {
           if (loc in data.locations) {
             data.locations[loc] = fruit;
@@ -1079,12 +1078,20 @@ function importLayout() {
         });
 
         data.log.unshift(
-          `${new Date().toLocaleString()} | 匯入治具分布位置 | 操作者: 管理員`
+          `${new Date().toLocaleString()} | 匯入治具分布位置 | 操作者: ${currentUser || '管理員'}`
         );
 
-        save();
-        render();
-        alert('治具分布位置匯入完成');
+        // 🔥 等雲端存成功後再 render
+        save().then(() => {
+
+          render();
+          alert('☁️ 匯入完成，已同步至雲端');
+
+        }).catch(err => {
+
+          alert('❌ 雲端同步失敗: ' + err.message);
+
+        });
 
       } catch (err) {
         alert('檔案格式錯誤，請確認為正確的 JSON');
