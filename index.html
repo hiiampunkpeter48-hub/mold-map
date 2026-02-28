@@ -364,6 +364,7 @@ header {
   <button id="dropdownBtn" type="button">▼</button>
 <button onclick="doSearch()">🔍Search</button>
 <button onclick="clearHighlight()">🧹Clear</button></div>
+  
 
 <div id="board"></div>
 
@@ -398,21 +399,22 @@ header {
 <script>
 
 /* =====================================================
-   無網路直接關閉
+   無網路提示（不清空頁面）
 ===================================================== */
 
-function forceClose(message){
-    alert(message);
-    document.body.innerHTML = "";
-    throw new Error("Disconnected");
-}
-
+// 一開始就檢查網路狀態
 if (!navigator.onLine) {
-    forceClose("裝置未連線，系統關閉");
+    alert("裝置未連線，部分功能可能無法使用");
 }
 
-window.addEventListener("offline", function(){
-    forceClose("網路中斷，系統關閉");
+// 當網路斷開時
+window.addEventListener("offline", function() {
+    alert("網路中斷，部分功能可能無法使用");
+});
+
+// 當網路恢復時（可選）
+window.addEventListener("online", function() {
+    console.log("網路已恢復");
 });
 
 
@@ -551,9 +553,15 @@ function save(){
 
 firebase.database().ref(".info/connected")
 .on("value", function(snap){
-    if(snap.val() !== true){
-        forceClose("與雲端失去連線");
+
+    if(snap.val() === true){
+        console.log("已連線");
+    } else {
+        alert("與雲端失去連線");
+        // 不要刪 body
+        // 不要 throw
     }
+
 });
 
 
@@ -1320,4 +1328,3 @@ function updateData(callback){
 </script>
 </body>
 </html>
-
