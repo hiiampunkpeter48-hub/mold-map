@@ -1042,67 +1042,55 @@ function exportLayout() {
   URL.revokeObjectURL(a.href);
 }
 
-/* ====== 匯入治具分布位置（雲端同步版） ====== */
+/* ====== 匯入治具分布位置 ====== */
 function importLayout() {
   if (!isAdmin) return alert('請先登入管理員');
 
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
+  reader.onload = e => {
+  let imported;
 
-  input.onchange = () => {
-    const file = input.files[0];
-    if (!file) return;
+  try {
+    imported = JSON.parse(e.target.result);
+  } catch (err) {
+    alert('JSON 解析失敗: ' + err.message);
+    return;
+  }
 
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        const imported = JSON.parse(e.target.result);
+  if (!confirm('匯入會覆蓋目前所有治具位置，確定繼續？')) return;
 
-        if (!confirm('匯入會覆蓋目前所有治具位置，確定繼續？')) return;
+  try {
 
-        safeInit();
+    safeInit();
 
-        // ===== 清空 =====
-        Object.keys(data.locations).forEach(k => data.locations[k] = null);
-        data.fruits = [];
+    Object.keys(data.locations).forEach(k => data.locations[k] = null);
+    data.fruits = [];
 
-        // ===== 還原 =====
-        Object.entries(imported).forEach(([loc, fruit]) => {
-          if (loc in data.locations) {
-            data.locations[loc] = fruit;
-            if (!data.fruits.includes(fruit)) {
-              data.fruits.push(fruit);
-            }
-          }
-        });
+    Object.entries(imported).forEach(([loc, fruit]) => {
+      data.locations[loc] = fruit;
 
-        data.log.unshift(
-          `${new Date().toLocaleString()} | 匯入治具分布位置 | 操作者: ${currentUser || '管理員'}`
-        );
-
-        // 🔥 等雲端存成功後再 render
-        save().then(() => {
-
-          render();
-          alert('☁️ 匯入完成，已同步至雲端');
-
-        }).catch(err => {
-
-          alert('❌ 雲端同步失敗: ' + err.message);
-
-        });
-
-      } catch (err) {
-        alert('檔案格式錯誤，請確認為正確的 JSON');
+      if (!data.fruits.includes(fruit)) {
+        data.fruits.push(fruit);
       }
-    };
+    });
 
-    reader.readAsText(file);
-  };
+    data.log.unshift(
+      `${new Date().toLocaleString()} | 匯入治具分布位置 | 操作者: ${currentUser || '管理員'}`
+    );
 
-  input.click();
-}
+    save()
+      .then(() => {
+        render();
+        alert('☁️ 匯入完成，已同步至雲端');
+      })
+      .catch(err => {
+        alert('❌ 雲端同步失敗: ' + err.message);
+      });
+
+  } catch (err) {
+    console.error(err);
+    alert('匯入流程錯誤: ' + err.message);
+  }
+};
 
 /* ====== 匯出 dropdown 治具 KEY ====== */
 function exportDropdownKeys() {
