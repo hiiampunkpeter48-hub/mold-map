@@ -532,12 +532,14 @@ if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Obje
 database.ref("systemData").on("value", function(snapshot){
     if(snapshot.exists()){
         data = snapshot.val();
-        safeInit();
+        // ✅ 已有資料，不要亂初始化
         render();
         writeLog("☁️ 已同步最新資料");
     }else{
         // 第一次初始化
+        safeInit();   // 只在第一次補齊結構
         save(); 
+        render();
     }
 });
 
