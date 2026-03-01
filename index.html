@@ -231,9 +231,31 @@ input, button, select { padding: 8px; font-size: 16px; }
 .cell.selected { background: #ffd966; border-color: #cc9900; }
 
 /* 📌 搬移記錄視窗 */
-.log { white-space: pre; background: #111; color: #0f0; padding: 10px; height: 400px; width: 630px; overflow: auto; font-size: 8px; }
-.admin { background: #eef; padding: 10px; margin-top: 10px; }
-.hidden { display:none; }
+.log {
+  background: #111;
+  padding: 10px;
+  height: 400px;
+  width: 630px;
+  overflow: auto;
+  font-size: 8px;
+  font-family: monospace;
+}
+
+/* 每行 log */
+.logLine {
+  white-space: pre;
+  padding: 2px 4px;
+}
+
+/* 亮綠 */
+.logGreen {
+  color: #00ff00;
+}
+
+/* 白色 */
+.logWhite {
+  color: #ffffff;
+}
 
 /* ===============================
    📱 手機 / 平板 響應式設計
@@ -573,10 +595,10 @@ function save(){
       const fruit = data.locations[selected];
       if (fruit) {
         const ok = confirm(
-          `確定要搬移治具？\n\n` +
-          `治具：${fruit}\n` +
-          `從：${selected}\n` +
-          `到：${locKey}`
+          `เคลื่อนไหว_di chuyển_確定搬移？\n\n` +
+          `mold：${fruit}\n` +
+          `from：${selected}\n` +
+          `for：${locKey}`
         );
         if (!ok) return;  // ❌ 取消就不動
       }
@@ -1126,27 +1148,60 @@ function requireLogin(){
   return true;
 }
 
-// 再點一次自己 → 取消選取
 function select(loc){
   if(!requireLogin()) return;
+
   const fruit = data.locations[loc];
-// 再點一次自己 → 取消選取
-  if(selected===loc){ selected=null; hasMoved=false; render(); return; }
-// 第一次點 → 變黃色
-  if(!selected){ selected=loc; hasMoved=false; render(); return; }
-// 已移動過 → 清除選取
-  if(hasMoved){ selected=null; hasMoved=false; render(); return; }
-// 第二次點不同格 → 執行交換
+
+  // 再點一次自己 → 取消選取
+  if(selected===loc){
+    selected=null;
+    hasMoved=false;
+    render();
+    return;
+  }
+
+  // 第一次點 → 變黃色
+  if(!selected){
+    selected=loc;
+    hasMoved=false;
+    render();
+    return;
+  }
+
+  // 已移動過 → 清除選取
+  if(hasMoved){
+    selected=null;
+    hasMoved=false;
+    render();
+    return;
+  }
+
+  // 第二次點不同格 → 執行交換
   if(selected!==loc){
-    const a=data.locations[selected], b=data.locations[loc];
+
+    const a = data.locations[selected];
+    const b = data.locations[loc];
+
     if(a) removeDuplicateFruit(a, loc);
     if(b) removeDuplicateFruit(b, selected);
-// ⭐⭐⭐ 這裡就是移動 ⭐⭐⭐
-    data.locations[selected]=b;
-    data.locations[loc]=a;
+
+    // ⭐⭐⭐ 真正交換 ⭐⭐⭐
+    data.locations[selected] = b;
+    data.locations[loc] = a;
+
     const operator = isAdmin ? '管理員' : currentUser;
-// ⭐⭐⭐ 這裡就是寫 log ⭐⭐⭐
-    data.log.unshift(`${new Date().toLocaleString()} | ${selected} → ${loc} | ${a||'無治具'} | 操作者: ${operator}`);
+    const time = new Date().toLocaleString();
+
+    // ⭐⭐⭐ 雙向 log ⭐⭐⭐
+    data.log.unshift(
+      `${time} | ${selected} → ${loc} | ${a || '無治具'} | 操作者: ${operator}`
+    );
+
+    data.log.unshift(
+      `${time} | ${loc} → ${selected} | ${b || '無治具'} | 操作者: ${operator}`
+    );
+
     save();
     selected = loc;
     hasMoved = true;
@@ -1155,6 +1210,7 @@ function select(loc){
   }
 }
 
+// ============ 防止同一個治具出現在兩個位置 ============
 function removeDuplicateFruit(fruit, exceptLoc=null){
   for(const loc in data.locations) if(loc!==exceptLoc && data.locations[loc]===fruit) data.locations[loc]=null;
 }
@@ -1310,14 +1366,48 @@ function render() {
     .classList.toggle('hidden', !isAdmin);
 }
 
+// ================= 儲存搬移 =================
 function writeLog(text){
-    data.log.push(text);
-    const logDiv = document.getElementById("log");
-    if(logDiv){
-        logDiv.textContent = data.log.join("\n");
-        logDiv.scrollTop = logDiv.scrollHeight;
-    }
+    data.log.unshift(text);
+    renderLog();
 }
+
+// ================= 依操作交替顏色 =================
+function renderLog(){
+
+  const logDiv = document.getElementById("log");
+  logDiv.innerHTML = "";
+
+  let lastTime = null;
+  let operationIndex = -1;
+
+  data.log.forEach(line => {
+
+    // 取出時間（| 前面的部分）
+    const time = line.split("|")[0].trim();
+
+    // 如果時間改變 → 代表新操作
+    if(time !== lastTime){
+      operationIndex++;
+      lastTime = time;
+    }
+
+    const div = document.createElement("div");
+    div.classList.add("logLine");
+
+    if(operationIndex % 2 === 0){
+      div.classList.add("logGreen");
+    } else {
+      div.classList.add("logWhite");
+    }
+
+    div.textContent = line;
+    logDiv.appendChild(div);
+  });
+
+  logDiv.scrollTop = logDiv.scrollHeight;
+}
+
 
 /* ====== 避免漏掉 save()，統一入口 ====== */
 function updateData(callback){
