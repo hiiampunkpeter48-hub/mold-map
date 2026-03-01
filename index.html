@@ -601,6 +601,70 @@ function save(){
 /* =====================================================
    核心功能區
 ===================================================== */
+// ================= 操作 =================
+function requireLogin(){
+  if(isAdmin){ lastActivity=Date.now(); return true; }
+  if(!currentUser){ alert('โปรดเลือกผู้ใช้\n' +
+  'Vui lòng chọn người dùng\n' +
+  '請選擇使用者'); return false; }
+  lastActivity=Date.now();
+  return true;
+}
+
+function select(loc){
+  if(!requireLogin()) return;
+
+  const fruit = data.locations[loc];
+
+  // 再點一次自己 → 取消選取
+  if(selected===loc){
+    selected=null;
+    hasMoved=false;
+    render();
+    return;
+  }
+
+  // 第一次點 → 變黃色
+  if(!selected){
+    selected=loc;
+    hasMoved=false;
+    render();
+    return;
+  }
+
+  // 第二次點不同格 → 執行交換
+  if(selected!==loc){
+
+    const a = data.locations[selected];
+    const b = data.locations[loc];
+
+    if(a) removeDuplicateFruit(a, loc);
+    if(b) removeDuplicateFruit(b, selected);
+
+    // ⭐⭐⭐ 真正交換 ⭐⭐⭐
+    data.locations[selected] = b;
+    data.locations[loc] = a;
+
+    const operator = isAdmin ? '管理員' : currentUser;
+    const time = new Date().toLocaleString();
+
+    // ⭐⭐⭐ 雙向 log ⭐⭐⭐
+    data.log.unshift(
+      `${time} | ${selected} → ${loc} | ${a || '無治具'} | 操作者: ${operator}`
+    );
+
+    data.log.unshift(
+      `${time} | ${loc} → ${selected} | ${b || '無治具'} | 操作者: ${operator}`
+    );
+
+    save();
+    selected = loc;
+    hasMoved = true;
+    pendingClear = true;
+    render();
+  }
+}
+
 // 安全版本：治具顏色跟隨 搬移前跳確認
 (function(){
   function updateFruitColors() {
@@ -620,6 +684,15 @@ function save(){
   const originalSelect = select;  // 假設 select 是點格子觸發搬移
   select = function(locKey){
 
+  // 已移動過 → 清除選取
+  if(hasMoved){
+    selected=null;
+    hasMoved=false;
+    render();
+    return;
+  }
+
+// ⭐ 再處理搬移確認
     if (selected && selected !== locKey) {
       const fruit = data.locations[selected];
       if (fruit) {
@@ -1164,77 +1237,6 @@ function cell(locKey, displayName) {
   return d;
 }
 
-// ================= 操作 =================
-function requireLogin(){
-  if(isAdmin){ lastActivity=Date.now(); return true; }
-  if(!currentUser){ alert('โปรดเลือกผู้ใช้\n' +
-  'Vui lòng chọn người dùng\n' +
-  '請選擇使用者'); return false; }
-  lastActivity=Date.now();
-  return true;
-}
-
-function select(loc){
-  if(!requireLogin()) return;
-
-  const fruit = data.locations[loc];
-
-  // 再點一次自己 → 取消選取
-  if(selected===loc){
-    selected=null;
-    hasMoved=false;
-    render();
-    return;
-  }
-
-  // 第一次點 → 變黃色
-  if(!selected){
-    selected=loc;
-    hasMoved=false;
-    render();
-    return;
-  }
-
-  // 已移動過 → 清除選取
-  if(hasMoved){
-    selected=null;
-    hasMoved=false;
-    render();
-    return;
-  }
-
-  // 第二次點不同格 → 執行交換
-  if(selected!==loc){
-
-    const a = data.locations[selected];
-    const b = data.locations[loc];
-
-    if(a) removeDuplicateFruit(a, loc);
-    if(b) removeDuplicateFruit(b, selected);
-
-    // ⭐⭐⭐ 真正交換 ⭐⭐⭐
-    data.locations[selected] = b;
-    data.locations[loc] = a;
-
-    const operator = isAdmin ? '管理員' : currentUser;
-    const time = new Date().toLocaleString();
-
-    // ⭐⭐⭐ 雙向 log ⭐⭐⭐
-    data.log.unshift(
-      `${time} | ${selected} → ${loc} | ${a || '無治具'} | 操作者: ${operator}`
-    );
-
-    data.log.unshift(
-      `${time} | ${loc} → ${selected} | ${b || '無治具'} | 操作者: ${operator}`
-    );
-
-    save();
-    selected = loc;
-    hasMoved = true;
-    pendingClear = true;
-    render();
-  }
-}
 
 // ============ 防止同一個治具出現在兩個位置 ============
 function removeDuplicateFruit(fruit, exceptLoc=null){
