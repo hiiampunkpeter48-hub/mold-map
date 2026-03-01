@@ -563,6 +563,32 @@ database.ref("systemData").on("value", function(snapshot){
     }
 });
 
+/* =====================================================
+   Firebase 連線監聽（斷線 5 秒才 alert）
+===================================================== */
+
+let disconnectTimer = null;
+
+firebase.database().ref(".info/connected")
+.on("value", function(snap){
+    if(snap.val() === true){
+        console.log("已連線");
+        // 連線恢復 → 清除計時器
+        if(disconnectTimer){
+            clearTimeout(disconnectTimer);
+            disconnectTimer = null;
+        }
+    } else {
+        // 斷線時，5 秒後才 alert
+        if(!disconnectTimer){
+            disconnectTimer = setTimeout(()=>{
+                alert("與雲端連線中");
+                console.warn("Firebase disconnected");
+            }, 5000);
+        }
+    }
+});
+
 
 /* =====================================================
    儲存到雲端（所有操作都用這個）
@@ -1361,7 +1387,9 @@ function render() {
     board.appendChild(div);
   });
 
-  document.getElementById('log').textContent = data.log.join('\n');
+    // ✅ 改成這行
+  renderLog();
+
   document.querySelectorAll('.adminOnly')
     .forEach(b=>b.style.display=isAdmin?'':'none');
 
