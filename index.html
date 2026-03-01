@@ -1257,15 +1257,19 @@ function safeInit(){
   if(!data.roomOrder) data.roomOrder = Object.keys(data.rooms);
   if(!data.boxOrder) data.boxOrder = Object.keys(data.boxes);
 
-  // ========= 補齊所有 Room Table =========
-  for(const room in data.rooms){
-    data.rooms[room].forEach(table=>{
-      const key = `${room}|${table}`;
-      if(!(key in data.locations)){
-        data.locations[key] = null;
-      }
-    });
-  }
+// ========= 補齊所有 Room Table =========
+data.roomOrder.forEach(room => {
+
+  if (!data.rooms[room]) return;
+
+  data.rooms[room].forEach(table => {
+    const key = `${room}|${table}`;
+    if (!(key in data.locations)) {
+      data.locations[key] = null;
+    }
+  });
+
+});
 
   // ========= 補齊所有 Box 小框 =========
   Object.values(data.boxes).flat().forEach(boxCell=>{
@@ -1349,11 +1353,9 @@ function writeLog(text){
 
 /* ====== 避免漏掉 save()，統一入口 ====== */
 function updateData(callback){
-
   callback();   // 修改 data
-  save();
-  render();
-
+  save();       // 存雲端
+  // 不要 render()
 }
 
 
