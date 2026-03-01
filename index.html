@@ -582,7 +582,7 @@ firebase.database().ref(".info/connected")
         // 斷線時，5 秒後才 alert
         if(!disconnectTimer){
             disconnectTimer = setTimeout(()=>{
-                alert("與雲端連線中");
+                alert("Cloud loading ...");
                 console.warn("Firebase disconnected");
             }, 5000);
         }
@@ -1397,7 +1397,7 @@ function render() {
 }
 
 // ================= 儲存搬移 =================
-function writeLog(text){
+function writeLog(text){ // 最新在最上面
     data.log.unshift(text);
     renderLog();
 }
@@ -1434,8 +1434,8 @@ function renderLog(){
     div.textContent = line;
     logDiv.appendChild(div);
   });
-
-  logDiv.scrollTop = logDiv.scrollHeight;
+  // ❌ 不要自動滾動 → 保持原本位置
+  // logDiv.scrollTop = logDiv.scrollHeight;
 }
 
 
