@@ -1011,6 +1011,7 @@ function adminLogin() {
 }
 
 /* ====== 搜尋 ====== */
+/* ====== 搜尋 ====== */
 function doSearch() {
   if (!requireLogin()) return;
 
@@ -1026,6 +1027,7 @@ function doSearch() {
   const exact = [];
   const fuzzy = [];
 
+  // 找出符合的治具
   Object.entries(data.locations).forEach(([loc, fruit]) => {
     if (!fruit) return;
     const f = fruit.toLowerCase();
@@ -1037,28 +1039,29 @@ function doSearch() {
   highlightFruits = hits.map(h => h.fruit);
   hitLocs = hits.map(h => h.loc);
 
-render();
+  render();
 
-if (hitLocs.length) {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
+  if (hitLocs.length) {
+    // 依畫面上位置排序
+    const elements = hitLocs
+      .map(loc => document.getElementById(`cell-${loc}`))
+      .filter(el => el); // 避免 null
 
-      const el = document.getElementById(`cell-${hitLocs[0]}`);
-      if (!el) return;
+    elements.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
 
-      const rect = el.getBoundingClientRect();
-      const y = rect.top + window.scrollY;
+    const el = elements[0]; // 畫面上第一個格子
+    const rect = el.getBoundingClientRect();
+    const y = rect.top + window.scrollY;
 
-      window.scrollTo({
-        top: y - window.innerHeight / 2 + rect.height / 2,
-        behavior: 'smooth'
-      });
-
+    window.scrollTo({
+      top: y - window.innerHeight / 2 + rect.height / 2,
+      behavior: 'smooth'
     });
-  });
-} else {
+
+  } else {
     alert('查無治具');
   }
+}
   // ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
   document.getElementById('dropdown').classList.add('hidden');
 }
