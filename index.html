@@ -548,36 +548,9 @@ function save(){
 }
 
 /* =====================================================
-   Firebase 連線監聽（斷線 5 秒才 alert）
-===================================================== */
-
-let disconnectTimer = null;
-
-firebase.database().ref(".info/connected")
-.on("value", function(snap){
-    if(snap.val() === true){
-        console.log("已連線");
-        // 連線恢復 → 清除計時器
-        if(disconnectTimer){
-            clearTimeout(disconnectTimer);
-            disconnectTimer = null;
-        }
-    } else {
-        // 斷線時，5 秒後才 alert
-        if(!disconnectTimer){
-            disconnectTimer = setTimeout(()=>{
-                alert("與雲端失去連線，部分功能可能暫時不可用");
-                console.warn("Firebase disconnected");
-            }, 5000);
-        }
-    }
-});
-
-
-/* =====================================================
    核心功能區
 ===================================================== */
-// 安全版本：治具顏色跟隨
+// 安全版本：治具顏色跟隨 搬移前跳確認
 (function(){
   function updateFruitColors() {
     Object.keys(data.locations).forEach(locKey => {
@@ -593,6 +566,27 @@ firebase.database().ref(".info/connected")
     });
   }
 
+  const originalSelect = select;  // 假設 select 是點格子觸發搬移
+  select = function(locKey){
+
+    if (selected && selected !== locKey) {
+      const fruit = data.locations[selected];
+      if (fruit) {
+        const ok = confirm(
+          `確定要搬移治具？\n\n` +
+          `治具：${fruit}\n` +
+          `從：${selected}\n` +
+          `到：${locKey}`
+        );
+        if (!ok) return;  // ❌ 取消就不動
+      }
+    }
+
+    originalSelect(locKey); // 真的搬移（修改 data.locations）
+    render();               // render 後自動更新顏色
+  };
+
+  // render 包裝更新顏色
   const originalRender = render;
   render = function() {
     originalRender();
