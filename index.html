@@ -390,10 +390,8 @@ header {
     <button onclick="addFruit()" class="adminOnly">新增治具</button>
     <button onclick="removeFruit()" class="adminOnly">刪除治具</button>
     <button onclick="editNames()">編輯機台 / 工作桌 / 治具架名稱</button>
-    <button onclick="exportLog()">匯出搬移記錄 (txt)</button>
-<button onclick="exportDropdownKeys()">匯出治具清單 (txt)</button>
-<button onclick="exportLayout()">匯出治具分布位置</button>
-<button onclick="importLayout()">匯入治具分布位置</button>
+<button onclick="exportBackup()">匯出layout + log</button>
+<button onclick="importBackup()">匯入layout + log）</button>
 </div>
 </div>
 
@@ -610,26 +608,6 @@ function zoomImage(img) {
   overlay.onclick = () => overlay.remove();
 }
 
-function exportLog() {
-  if (!data.log || !data.log.length) {
-    alert('目前沒有搬移記錄');
-    return;
-  }
-  const text = data.log.join('\n');  // ✅ 用真正的 log
-  const blob = new Blob([text], {
-    type: 'text/plain;charset=utf-8;'
-  });
-
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'move_log.txt';
-
-  document.body.appendChild(a); // ⭐ Safari 保險
-  a.click();
-  document.body.removeChild(a);
-
-  URL.revokeObjectURL(a.href);
-}
 
 function userLogin() {
   const sel = document.getElementById('userSelect').value;
@@ -1031,24 +1009,29 @@ function removeFruit() {
 render();
 }
 
-/* ====== 匯出治具分布位置 ====== */
-function exportLayout() {
+// ====== 匯出完整備份 (位置 + log) ======
+function exportBackup() {
   if (!isAdmin) return alert('請先登入管理員');
 
   const layout = {};
-
   Object.entries(data.locations).forEach(([loc, fruit]) => {
     if (fruit) layout[loc] = fruit;
   });
 
+  const backup = {
+    layout: layout,
+    log: data.log || [],
+    exportTime: new Date().toLocaleString()
+  };
+
   const blob = new Blob(
-    [JSON.stringify(layout, null, 2)],
+    [JSON.stringify(backup, null, 2)],
     { type: 'application/json;charset=utf-8;' }
   );
 
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'tool_layout.json';
+  a.download = 'tool_backup.json';
 
   document.body.appendChild(a);
   a.click();
@@ -1056,8 +1039,8 @@ function exportLayout() {
   URL.revokeObjectURL(a.href);
 }
 
-/* ====== 匯入治具分布位置 ====== */
-function importLayout() {
+// ====== 匯入完整備份 ======
+function importBackup() {
   if (!isAdmin) return alert('請先登入管理員');
 
   const input = document.createElement('input');
@@ -1073,32 +1056,38 @@ function importLayout() {
       try {
         const imported = JSON.parse(e.target.result);
 
-        if (!confirm('匯入會覆蓋目前所有治具位置，確定繼續？')) return;
+        if (!confirm('匯入會覆蓋目前所有治具位置與記錄，確定繼續？')) return;
 
-        // ⭐ 先確保位置完整
         safeInit();
 
-        // ⭐ 清空所有治具
+        // 清空位置
         Object.keys(data.locations).forEach(k => data.locations[k] = null);
         data.fruits = [];
 
-        // ⭐ 依匯入資料還原
-        Object.entries(imported).forEach(([loc, fruit]) => {
-          if (loc in data.locations) {
-            data.locations[loc] = fruit;
-            if (!data.fruits.includes(fruit)) {
-              data.fruits.push(fruit);
+        // 還原位置
+        if (imported.layout) {
+          Object.entries(imported.layout).forEach(([loc, fruit]) => {
+            if (loc in data.locations) {
+              data.locations[loc] = fruit;
+              if (!data.fruits.includes(fruit)) {
+                data.fruits.push(fruit);
+              }
             }
-          }
-        });
+          });
+        }
+
+        // ⭐ 還原 log
+        if (Array.isArray(imported.log)) {
+          data.log = imported.log;
+        }
 
         data.log.unshift(
-          `${new Date().toLocaleString()} | 匯入治具分布位置 | 操作者: 管理員`
+          `${new Date().toLocaleString()} | 匯入完整備份 | 操作者: 管理員`
         );
 
         save();
         render();
-        alert('治具分布位置匯入完成');
+        alert('完整備份匯入完成');
 
       } catch (err) {
         alert('檔案格式錯誤，請確認為正確的 JSON');
@@ -1111,37 +1100,16 @@ function importLayout() {
   input.click();
 }
 
-/* ====== 匯出 dropdown 治具 KEY ====== */
-function exportDropdownKeys() {
-  if (!isAdmin) return alert('請先登入管理員');
 
-  if (!data.fruits || data.fruits.length === 0) {
-    return alert('目前沒有治具可匯出');
-  }
-
-  const content = data.fruits.join('\n'); // 一行一個
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8;' });
-
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'fixtures.txt';
-  a.click();
-
-  data.log.unshift(
-    `${new Date().toLocaleString()} | 匯出治具清單(txt) | 操作者: 管理員`
-  );
-
-  save();
-}
-
+// ======  UI渲染 建立畫面格子  ======
 function cell(locKey, displayName) {
   const d = document.createElement('div');
-  const f = data.locations[locKey];
+  const f = data.locations[locKey]; // 讀取該位置的治具
   d.className = 'cell';
   d.id = `cell-${locKey}`;
   if (!f) d.classList.add('empty');
   if (highlightFruits.includes(f)) d.classList.add('highlight');
-  if (selected===locKey) d.classList.add('selected');
+  if (selected===locKey) d.classList.add('selected'); // 設定點擊事件
   if (locKey===newlyAddedLoc) d.classList.add('new-added');
   d.textContent = `${displayName}: ${f || '(null)'}`;
   d.onclick = ()=>select(locKey);
