@@ -1010,7 +1010,8 @@ function adminLogin() {
   }
 }
 
-/* ====== 搜尋 ====== */
+
+/* ====== 搜尋（優先 roomOrder） ====== */
 function doSearch() {
   if (!requireLogin()) return;
 
@@ -1037,28 +1038,39 @@ function doSearch() {
   highlightFruits = hits.map(h => h.fruit);
   hitLocs = hits.map(h => h.loc);
 
-render();
+  render();
 
-if (hitLocs.length) {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
+  if (hitLocs.length) {
+    // 依 roomOrder 與 table 排序
+    hitLocs.sort((a, b) => {
+      const [roomA, tableA] = a.split('|');
+      const [roomB, tableB] = b.split('|');
 
-      const el = document.getElementById(`cell-${hitLocs[0]}`);
-      if (!el) return;
+      const roomIndexA = data.roomOrder.indexOf(roomA);
+      const roomIndexB = data.roomOrder.indexOf(roomB);
+      if (roomIndexA !== roomIndexB) return roomIndexA - roomIndexB;
 
-      const rect = el.getBoundingClientRect();
-      const y = rect.top + window.scrollY;
-
-      window.scrollTo({
-        top: y - window.innerHeight / 2 + rect.height / 2,
-        behavior: 'smooth'
-      });
-
+      // table_n 轉成數字排序
+      const numA = parseInt(tableA.replace('table_', ''), 10);
+      const numB = parseInt(tableB.replace('table_', ''), 10);
+      return numA - numB;
     });
-  });
-} else {
+
+    const el = document.getElementById(`cell-${hitLocs[0]}`);
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const y = rect.top + window.scrollY;
+
+    window.scrollTo({
+      top: y - window.innerHeight / 2 + rect.height / 2,
+      behavior: 'smooth'
+    });
+
+  } else {
     alert('查無治具');
   }
+}
   // ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
   document.getElementById('dropdown').classList.add('hidden');
 }
