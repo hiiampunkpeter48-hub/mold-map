@@ -1109,29 +1109,26 @@ function importBackup() {
 
         if (!confirm('匯入會覆蓋目前所有治具位置與記錄，確定繼續？')) return;
 
-        safeInit();
-
-        // 清空位置
-        Object.keys(data.locations).forEach(k => data.locations[k] = null);
+        // ✅ 先清空
         data.fruits = [];
+        data.locations = {};
+        data.log = [];
 
-        // 還原位置
+        // ✅ 還原位置
         if (imported.layout) {
           Object.entries(imported.layout).forEach(([loc, fruit]) => {
-            if (loc in data.locations) {
-              data.locations[loc] = fruit;
-              if (!data.fruits.includes(fruit)) {
-                data.fruits.push(fruit);
-              }
-            }
+            data.locations[loc] = fruit;
+            if (!data.fruits.includes(fruit)) data.fruits.push(fruit);
           });
         }
 
-        // ⭐ 還原 log
-        if (Array.isArray(imported.log)) {
-          data.log = imported.log;
-        }
+        // ✅ 還原 log
+        if (Array.isArray(imported.log)) data.log = imported.log;
 
+        // ⭐ 補齊缺少 key（safeInit 會確保所有房間 / box 都有 key）
+        safeInit();
+
+        // 加入一筆匯入紀錄
         data.log.unshift(
           `${new Date().toLocaleString()} | 匯入完整備份 | 操作者: 管理員`
         );
