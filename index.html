@@ -694,6 +694,7 @@ function select(loc){
 
 // ⭐ 再處理搬移確認
     if (selected && selected !== locKey) {
+const fruit = data.locations[selected];  // ⭐ 補這行
         const ok = confirm(
           `เคลื่อนไหว_di chuyển_確定搬移？\n\n` +
           `mold：${fruit}\n` +
@@ -703,7 +704,7 @@ function select(loc){
         if (!ok) return;  // ❌ 取消就不動
     }
 
-    originalSelect(locKey); // 真的搬移（修改 data.locations）
+   originalSelect(locKey); // 真的搬移（修改 data.locations）
     render();               // render 後自動更新顏色
   };
 
