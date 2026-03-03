@@ -699,10 +699,15 @@ const fruit = data.locations[selected];  // ⭐ 補這行
           `เคลื่อนไหว_di chuyển_確定搬移？\n\n` +
           `mold：${fruit}\n` +
           `from：${selected}\n` +
-          `for ：${locKey}`
+          `for　：${locKey}`
         );
         if (!ok) return;  // ❌ 取消就不動
+        selected = null;
+        hasMoved = false;
+        render();
+        return;
     }
+  }
 
    originalSelect(locKey); // 真的搬移（修改 data.locations）
     render();               // render 後自動更新顏色
@@ -1394,8 +1399,8 @@ function render() {
     .classList.toggle('hidden', !isAdmin);
 }
 
-// ================= 儲存搬移 =================
-function writeLog(text){ // 最新在最上面
+// ================= 儲存搬移記錄 =================
+function writeLog(text){ // 最新在視窗最上面
     data.log.unshift(text);
     renderLog();
 }
