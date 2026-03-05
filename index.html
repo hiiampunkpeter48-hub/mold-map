@@ -10,6 +10,54 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
+/* 📌按鈕 */
+.pinBtn{
+  position:absolute;
+  top:2px;
+  right:2px;
+  font-size:14px;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  z-index:5;
+}
+
+/* 📌框格動畫 */
+.pinned{
+  position:relative;
+}
+
+.pinned::before{
+  content:"";
+  position:absolute;
+  inset:-3px;
+  border-radius:6px;
+  padding:2px;
+  background:conic-gradient(
+    red,
+    orange,
+    yellow,
+    lime,
+    cyan,
+    blue,
+    violet,
+    red
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  animation:snakeBorder 2s linear infinite;
+}
+
+@keyframes snakeBorder{
+  from{ transform:rotate(0deg);}
+  to{ transform:rotate(360deg);}
+}
+
+
 /* ===== 懸浮按鈕 ===== */
 #floatingBtn {
   position: fixed;
@@ -401,10 +449,10 @@ header {
 <div id="floatingBtn">☰</div>
 
 <div id="floatingMenu" class="floatingMenu hidden">
-  <button onclick="scrollTopPage()">⬆ run to the top</button>
-  <button onclick="openRoomSelector()">🏭 choose rooms</button>
-  <button onclick="openBoxSelector()">📦 choose boxes</button>
-  <button onclick="scrollBottomPage()">⬇ run to the bottom</button>
+  <button onclick="scrollTopPage()">⬆ Run to the top</button>
+  <button onclick="openRoomSelector()">🏭 Choose rooms</button>
+  <button onclick="openBoxSelector()">📦 Choose boxes</button>
+  <button onclick="scrollBottomPage()">⬇ Run to the bottom</button>
 </div>
 
 <div class="adminBar">
@@ -598,6 +646,9 @@ function save(){
     database.ref("systemData").set(data);
 }
 
+// ================= 釘選設定 =================
+const pinnedCells = new Set();
+
 /* =====================================================
    核心功能區
 ===================================================== */
@@ -714,12 +765,65 @@ const fruit = data.locations[selected];  // ⭐ 補這行
   };
 
   // render 包裝更新顏色
-  const originalRender = render;
-  render = function() {
-    originalRender();
-    updateFruitColors();
-  };
-})();
+const originalRender = render;
+render = function() {
+
+  originalRender();
+  updateFruitColors();
+
+  // ⭐顯示📌按鈕
+  if(selected){
+
+    const fruit = data.locations[selected];
+
+    if(fruit && !pinnedCells.has(selected)){
+      updatePinButton(selected);
+    }
+  }
+
+};
+
+// 處理釘選按鈕
+function updatePinButton(locKey){
+
+  const cell = document.getElementById(`cell-${locKey}`);
+  if(!cell) return;
+
+  const fruit = data.locations[locKey];
+  if(!fruit) return;
+
+  let btn = cell.querySelector(".pinBtn");
+
+  // 如果沒有按鈕 → 建立
+  if(!btn){
+    btn = document.createElement("button");
+    btn.className="pinBtn";
+    btn.textContent="📌";
+
+    btn.onclick=(e)=>{
+      e.stopPropagation();
+
+      if(!pinnedCells.has(locKey)){
+        pinnedCells.add(locKey);
+        cell.classList.add("pinned");
+        cell.classList.remove("selected");
+        btn.textContent="📌→❌";
+      }
+      else{
+        pinnedCells.delete(locKey);
+        cell.classList.remove("pinned");
+        btn.remove();
+      }
+    };
+
+    cell.appendChild(btn);
+  }
+
+  // 如果已經 pinned
+  if(pinnedCells.has(locKey)){
+    btn.textContent="📌→❌";
+  }
+}
 
 // 📌 圖片放大功能 -->
 function zoomImage(img) {
@@ -942,6 +1046,7 @@ function createSelector(title, items, prefixText) {
   overlay.style.display = 'flex';
   overlay.style.alignItems = 'center';
   overlay.style.justifyContent = 'center';
+  overlay.style.zIndex = '9999';
 
   const box = document.createElement('div');
   box.style.background = 'white';
