@@ -27,43 +27,30 @@
 }
 
 /* 📌邊框動畫 */
-.pinned{
-  position:relative;
+/* 釘選動畫 */
+@property --angle{
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
 }
 
-.pinned::after{
-  content:"";
-  position:absolute;
-  inset:-2px;
-  border-radius:6px;
+.cell.pinned{
+  border:0.5rem solid transparent;
 
-  background:
-    linear-gradient(90deg, red 25%, transparent 25%) top left,
-    linear-gradient(180deg, red 25%, transparent 25%) top right,
-    linear-gradient(270deg, red 25%, transparent 25%) bottom right,
-    linear-gradient(0deg, red 25%, transparent 25%) bottom left;
+  border-image:
+    conic-gradient(
+      from var(--angle),
+      #d53e33 0deg 90deg,
+      #fbb300 90deg 180deg,
+      #377af5 180deg 270deg,
+      #399953 270deg 360deg
+    ) 1;
 
-  background-size:200% 3px,3px 200%,200% 3px,3px 200%;
-  background-repeat:no-repeat;
-
-  animation:snake 2s linear infinite;
+  animation:spinBorder 3s linear infinite;
 }
 
-@keyframes snake{
-  0%{
-    background-position:
-      -200% 0,
-      0 -200%,
-      200% 0,
-      0 200%;
-  }
-  100%{
-    background-position:
-      200% 0,
-      0 200%,
-      -200% 0,
-      0 -200%;
-  }
+@keyframes spinBorder{
+  to{ --angle:360deg; }
 }
 
 
@@ -655,8 +642,6 @@ function save(){
     database.ref("systemData").set(data);
 }
 
-// ================= 釘選設定 =================
-const pinnedCells = new Set();
 
 /* =====================================================
    核心功能區
@@ -774,7 +759,9 @@ const fruit = data.locations[selected];  // ⭐ 補這行
   };
 
   // render 包裝更新顏色
+// render 包裝更新顏色
 const originalRender = render;
+
 render = function(){
 
   originalRender();
@@ -791,12 +778,44 @@ render = function(){
 
   }
 
+  // ⭐恢復已釘選格子
+  pinnedCells.forEach(loc=>{
+
+    const cell = document.getElementById(`cell-${loc}`);
+
+    if(cell){
+
+      cell.classList.add("pinned");
+
+      if(!cell.querySelector(".pinBtn")){
+
+        const btn=document.createElement("button");
+        btn.className="pinBtn";
+        btn.textContent="📌→❌";
+
+        btn.onclick=(e)=>{
+          e.stopPropagation();
+          unpinCell(loc);
+        };
+
+        cell.appendChild(btn);
+      }
+    }
+
+  });
+
 };
 
+// ================= 結束 IIFE =================
 })();
 
 // ⭐處理釘選按鈕
-function showPinOnCell(loc){
+// ================= 釘選系統 =================
+
+const pinnedCells = new Set();
+
+// 建立釘選按鈕
+function createPinButton(loc){
 
   const cell = document.getElementById(`cell-${loc}`);
   if(!cell) return;
@@ -804,46 +823,68 @@ function showPinOnCell(loc){
   const fruit = data.locations[loc];
   if(!fruit) return;
 
-  let btn = cell.querySelector(".pinBtn");
+  // 如果已有📌→❌就不建立
+  if(pinnedCells.has(loc)) return;
 
-  if(!btn){
+  // 如果已存在按鈕就不建立
+  if(cell.querySelector(".pinBtn")) return;
 
-    btn = document.createElement("button");
-    btn.className="pinBtn";
-    btn.textContent="📌";
+  const btn = document.createElement("button");
+  btn.className="pinBtn";
+  btn.textContent="📌";
 
-    btn.onclick=(e)=>{
-      e.stopPropagation();
+  btn.onclick=(e)=>{
+    e.stopPropagation();
 
-      if(!pinnedCells.has(loc)){
+    pinCell(loc);
+  };
 
-        pinnedCells.add(loc);
+  cell.appendChild(btn);
+}
 
-        cell.classList.add("pinned");
 
-        // ⭐取消選取
-        selected=null;
-        hasMoved=false;
+// 釘選
+function pinCell(loc){
 
-        render();
+  const cell = document.getElementById(`cell-${loc}`);
+  if(!cell) return;
 
-      }else{
+  const btn = cell.querySelector(".pinBtn");
 
-        pinnedCells.delete(loc);
-        cell.classList.remove("pinned");
+  pinnedCells.add(loc);
 
-        btn.remove();
-      }
+  cell.classList.add("pinned");
 
-    };
+  // 恢復原本顏色
+  cell.classList.remove("selected");
 
-    cell.appendChild(btn);
-  }
+  // 清除選取
+  selected=null;
+  hasMoved=false;
 
-  if(pinnedCells.has(loc)){
-    btn.textContent="📌→❌";
-  }
+  // 按鈕變📌→❌
+  btn.textContent="📌→❌";
 
+  btn.onclick=(e)=>{
+    e.stopPropagation();
+    unpinCell(loc);
+  };
+}
+
+
+// 取消釘選
+function unpinCell(loc){
+
+  const cell = document.getElementById(`cell-${loc}`);
+  if(!cell) return;
+
+  const btn = cell.querySelector(".pinBtn");
+
+  pinnedCells.delete(loc);
+
+  cell.classList.remove("pinned");
+
+  if(btn) btn.remove();
 }
 
 // 📌 圖片放大功能 -->
@@ -1523,7 +1564,47 @@ function render() {
 
   document.getElementById('adminPanel')
     .classList.toggle('hidden', !isAdmin);
+
+// ⭐render後補上釘選按鈕
+if(selected){
+
+  const fruit = data.locations[selected];
+
+  if(fruit){
+    createPinButton(selected);
+  }
+
 }
+
+// ⭐恢復已釘選格子 (避免render洗掉)
+pinnedCells.forEach(loc=>{
+
+  const cellDiv = document.getElementById(`cell-${loc}`);
+
+  if(cellDiv){
+
+    cellDiv.classList.add("pinned");
+
+    if(!cellDiv.querySelector(".pinBtn")){
+
+      const btn=document.createElement("button");
+      btn.className="pinBtn";
+      btn.textContent="📌→❌";
+
+      btn.onclick=(e)=>{
+        e.stopPropagation();
+        unpinCell(loc);
+      };
+
+      cellDiv.appendChild(btn);
+    }
+
+  }
+
+});
+
+}
+
 
 // ================= 儲存搬移記錄 =================
 function writeLog(text){ // 最新在視窗最上面
