@@ -10,51 +10,60 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-/* 📌按鈕 */
+/* 📌按鈕在格子右上角 */
+.cell{
+  position:relative;
+}
+
 .pinBtn{
   position:absolute;
   top:2px;
   right:2px;
-  font-size:14px;
   border:none;
-  background:transparent;
+  background:white;
+  font-size:14px;
   cursor:pointer;
-  z-index:5;
+  z-index:10;
 }
 
-/* 📌框格動畫 */
+/* 📌邊框動畫 */
 .pinned{
   position:relative;
 }
 
-.pinned::before{
+.pinned::after{
   content:"";
   position:absolute;
-  inset:-3px;
+  inset:-2px;
   border-radius:6px;
-  padding:2px;
-  background:conic-gradient(
-    red,
-    orange,
-    yellow,
-    lime,
-    cyan,
-    blue,
-    violet,
-    red
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
 
-  animation:snakeBorder 2s linear infinite;
+  background:
+    linear-gradient(90deg, red 25%, transparent 25%) top left,
+    linear-gradient(180deg, red 25%, transparent 25%) top right,
+    linear-gradient(270deg, red 25%, transparent 25%) bottom right,
+    linear-gradient(0deg, red 25%, transparent 25%) bottom left;
+
+  background-size:200% 3px,3px 200%,200% 3px,3px 200%;
+  background-repeat:no-repeat;
+
+  animation:snake 2s linear infinite;
 }
 
-@keyframes snakeBorder{
-  from{ transform:rotate(0deg);}
-  to{ transform:rotate(360deg);}
+@keyframes snake{
+  0%{
+    background-position:
+      -200% 0,
+      0 -200%,
+      200% 0,
+      0 200%;
+  }
+  100%{
+    background-position:
+      200% 0,
+      0 200%,
+      -200% 0,
+      0 -200%;
+  }
 }
 
 
@@ -766,38 +775,39 @@ const fruit = data.locations[selected];  // ⭐ 補這行
 
   // render 包裝更新顏色
 const originalRender = render;
-render = function() {
+render = function(){
 
   originalRender();
   updateFruitColors();
 
-  // ⭐顯示📌按鈕
+  // ⭐在選取的格子顯示📌
   if(selected){
 
     const fruit = data.locations[selected];
 
-    if(fruit && !pinnedCells.has(selected)){
-      updatePinButton(selected);
+    if(fruit){
+      showPinOnCell(selected);
     }
+
   }
 
 };
 
 })();
 
-// 處理釘選按鈕
-function updatePinButton(locKey){
+// ⭐處理釘選按鈕
+function showPinOnCell(loc){
 
-  const cell = document.getElementById(`cell-${locKey}`);
+  const cell = document.getElementById(`cell-${loc}`);
   if(!cell) return;
 
-  const fruit = data.locations[locKey];
+  const fruit = data.locations[loc];
   if(!fruit) return;
 
   let btn = cell.querySelector(".pinBtn");
 
-  // 如果沒有按鈕 → 建立
   if(!btn){
+
     btn = document.createElement("button");
     btn.className="pinBtn";
     btn.textContent="📌";
@@ -805,26 +815,35 @@ function updatePinButton(locKey){
     btn.onclick=(e)=>{
       e.stopPropagation();
 
-      if(!pinnedCells.has(locKey)){
-        pinnedCells.add(locKey);
+      if(!pinnedCells.has(loc)){
+
+        pinnedCells.add(loc);
+
         cell.classList.add("pinned");
-        cell.classList.remove("selected");
-        btn.textContent="📌→❌";
-      }
-      else{
-        pinnedCells.delete(locKey);
+
+        // ⭐取消選取
+        selected=null;
+        hasMoved=false;
+
+        render();
+
+      }else{
+
+        pinnedCells.delete(loc);
         cell.classList.remove("pinned");
+
         btn.remove();
       }
+
     };
 
     cell.appendChild(btn);
   }
 
-  // 如果已經 pinned
-  if(pinnedCells.has(locKey)){
+  if(pinnedCells.has(loc)){
     btn.textContent="📌→❌";
   }
+
 }
 
 // 📌 圖片放大功能 -->
