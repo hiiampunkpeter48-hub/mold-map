@@ -85,7 +85,7 @@ z-index:5;
   left: 70px;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 99999;
+  z-index: 9999;
   background: white;
   border: 1px solid #999;
   padding: 10px;
@@ -450,8 +450,8 @@ header {
 
 <div id="floatingMenu" class="floatingMenu hidden">
   <button onclick="scrollTopPage()">⬆ 畫面移至頂端</button>
-  <button onclick="openRoomSelector()">🏭 選擇機台</button>
-  <button onclick="openBoxSelector()">📦 選擇治具區</button>
+  <button onclick="openRoomSelector()">🏭 選取機台</button>
+  <button onclick="openBoxSelector()">📦 選取治具區</button>
   <button onclick="scrollBottomPage()">⬇ 畫面移至底部</button>
 </div>
 
@@ -1108,7 +1108,6 @@ function createSelector(title, items, prefixText) {
   overlay.style.position = 'fixed';
   overlay.style.inset = '0';
   overlay.style.background = 'rgba(0,0,0,.5)';
-  overlay.style.zIndex = '100000';
   overlay.style.display = 'flex';
   overlay.style.alignItems = 'center';
   overlay.style.justifyContent = 'center';
@@ -1671,7 +1670,6 @@ function updateData(callback){
 </script>
 </body>
 </html>
-
 
 
 
