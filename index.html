@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mold Layout Map</title>
+<title>模治具位置 & 搬移紀錄</title>
 
 <!-- Firebase v8 CDN（不用 Node） -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -24,7 +24,7 @@
   border:none;
   border-radius:4px;
   font-size:14px;
-  padding:9px 9px;
+  padding:10px 10px;
   width:auto;
   cursor:pointer;
 }
@@ -49,7 +49,7 @@
       #399953 270deg 360deg
     ) 1;
 
-  animation:spinBorder 3s linear infinite;
+  animation:spinBorder 6s linear infinite;
 }
 
 @keyframes spinBorder{
@@ -405,7 +405,7 @@ header {
  <!-- 此處為base64圖檔 -->
 <!-- 省略 -->
   </div>
-  <div class="imageHint">👆👆คลิกเพื่อขยายภาพ_Nhấp chuột để phóng to hình ảnh</div>
+  <div class="imageHint">👆👆點圖放大_คลิกเพื่อขยายภาพ_Nhấp chuột để phóng to hình ảnh</div>
 </div>
 
   <!-- 第一排：使用者登入 -->
@@ -428,8 +428,8 @@ header {
 <option value="陶世紀">陶世紀</option>
 <option value="納瓦">納瓦</option>
     </select>
-<button id="userLoginBtn" onclick="userLogin()">👦Login</button>
-<button onclick="userLogout()">🚪User logout</button>
+<button id="userLoginBtn" onclick="userLogin()">👦使用者登入</button>
+<button onclick="userLogout()">🚪使用者登出</button>
 </div>
 
   <!-- 第二排：搜尋 -->
@@ -438,8 +438,8 @@ header {
   <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu (Ex: B8R / B...)" autocomplete="off" />
 <div id="dropdown" class="dropdown hidden"></div>
   <button id="dropdownBtn" type="button">▼</button>
-<button onclick="doSearch()">🔍Search</button>
-<button onclick="clearHighlight()">🧹Clear</button></div>
+<button onclick="doSearch()">🔍搜尋治具</button>
+<button onclick="clearHighlight()">🧹清除搜尋</button></div>
   
 
 <div id="board"></div>
@@ -448,10 +448,10 @@ header {
 <div id="floatingBtn">☰</div>
 
 <div id="floatingMenu" class="floatingMenu hidden">
-  <button onclick="scrollTopPage()">⬆ Run to the top</button>
-  <button onclick="openRoomSelector()">🏭 Choose rooms</button>
-  <button onclick="openBoxSelector()">📦 Choose boxes</button>
-  <button onclick="scrollBottomPage()">⬇ Run to the bottom</button>
+  <button onclick="scrollTopPage()">⬆ 畫面移至頂端</button>
+  <button onclick="openRoomSelector()">🏭 選擇機台</button>
+  <button onclick="openBoxSelector()">📦 選擇治具區</button>
+  <button onclick="scrollBottomPage()">⬇ 畫面移至底部</button>
 </div>
 
 <div class="adminBar">
@@ -526,31 +526,31 @@ let lastActivity = Date.now();
 ===================================================== */
 let data = {
 rooms: {
-  "E266":["table_1","table_2","table_3"],
-  "E262":["table_1","table_2","table_3"],
-  "E233":["table_1","table_2","table_3"],
-  "E202":["table_1","table_2","table_3"],
-  "E270":["table_1","table_2","table_3","table_4"],
-  "E269":["table_1","table_2","table_3","table_4"],
-  "E232":["table_1","table_2"],
-  "E225":["table_1","table_2","table_3","table_4"],
-  "E238":["table_1","table_2","table_3","table_4"],
-  "E243":["table_1","table_2","table_3","table_4"],
-  "E231":["table_1","table_2","table_3","table_4"],
-  "E225之1":["table_1","table_2","table_3","table_4"],
-  "E272":["table_1","table_2","table_3"],
-  "E234":["table_1","table_2","table_3","table_4"],
-  "E259":["table_1","table_2","table_3"],
-  "E237":["table_1","table_2","table_3","table_4"],
-  "E273":["table_1","table_2","table_3","table_4"],
-  "E248":["table_1","table_2","table_3","table_4"],
-  "E250":["table_1","table_2","table_3","table_4"],
-  "E260":["table_1","table_2","table_3","table_4"],
-  "E249":["table_1","table_2","table_3","table_4"],
-  "E251":["table_1","table_2","table_3","table_4"],
-  "預留1":["table_1","table_2","table_3","table_4"],
-  "預留2":["table_1","table_2","table_3","table_4"],
-  "預留3":["table_1","table_2","table_3","table_4"]
+  "E266":["工作桌_1","工作桌_2","工作桌_3"],
+  "E262":["工作桌_1","工作桌_2","工作桌_3"],
+  "E233":["工作桌_1","工作桌_2","工作桌_3"],
+  "E202":["工作桌_1","工作桌_2","工作桌_3"],
+  "E270":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E269":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E232":["工作桌_1","工作桌_2"],
+  "E225":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E238":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E243":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E231":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E225之1":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E272":["工作桌_1","工作桌_2","工作桌_3"],
+  "E234":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E259":["工作桌_1","工作桌_2","工作桌_3"],
+  "E237":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E273":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E248":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E250":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E260":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E249":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "E251":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "預留1":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "預留2":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+  "預留3":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"]
 },
 
   boxes: {
@@ -794,7 +794,7 @@ render = function(){
 
         const btn=document.createElement("button");
         btn.className="pinBtn";
-        btn.textContent="📌→❌";
+        btn.textContent="❌";
 
         btn.onclick=(e)=>{
           e.stopPropagation();
@@ -826,7 +826,7 @@ function createPinButton(loc){
   const fruit = data.locations[loc];
   if(!fruit) return;
 
-  // 如果已有📌→❌就不建立
+  // 如果已有❌就不建立
   if(pinnedCells.has(loc)) return;
 
   // 如果已存在按鈕就不建立
@@ -866,7 +866,7 @@ function pinCell(loc){
   hasMoved=false;
 
   // 按鈕變📌→❌
-  btn.textContent="📌→❌";
+  btn.textContent="❌";
 
   btn.onclick=(e)=>{
     e.stopPropagation();
