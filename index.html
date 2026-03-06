@@ -602,10 +602,19 @@ if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Obje
 database.ref("systemData").on("value", function(snapshot){
     if(snapshot.exists()){
         data = snapshot.val();
+
+        // ⭐ 自動把 table 轉成 工作桌
+        Object.keys(data.rooms).forEach(room=>{
+            data.rooms[room] = data.rooms[room].map(t =>
+                t.replace("table","工作桌")
+            );
+        });
+
+        save();   // ⭐ 存回 Firebase（只會改一次）
+
         safeInit();
         render();        
     } else {
-        // 第一次初始化
         save(); 
     }
 });
@@ -1665,6 +1674,7 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
 
 
