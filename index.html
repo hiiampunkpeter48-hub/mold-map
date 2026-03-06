@@ -430,7 +430,6 @@ header {
 <option value="納瓦">納瓦</option>
     </select>
 <button id="userLoginBtn" onclick="userLogin()">👦使用者登入</button>
-<button onclick="userLogout()">🚪使用者登出</button>
 </div>
 
   <!-- 第二排：搜尋 -->
@@ -630,7 +629,7 @@ firebase.database().ref(".info/connected")
         // 斷線時，5 秒後才 alert
         if(!disconnectTimer){
             disconnectTimer = setTimeout(()=>{
-                alert("Cloud loading ...");
+                alert("雲端資料連結中...");
                 console.warn("Firebase disconnected");
             }, 5000);
         }
