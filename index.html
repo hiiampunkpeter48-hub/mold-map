@@ -603,19 +603,29 @@ database.ref("systemData").on("value", function(snapshot){
     if(snapshot.exists()){
         data = snapshot.val();
 
-        // ⭐ 自動把 table 轉成 工作桌
+        // ⭐ rooms table → 工作桌
         Object.keys(data.rooms).forEach(room=>{
             data.rooms[room] = data.rooms[room].map(t =>
                 t.replace("table","工作桌")
             );
         });
 
-        save();   // ⭐ 存回 Firebase（只會改一次）
+        // ⭐ locations key table → 工作桌
+        const newLocations = {};
+
+        Object.keys(data.locations).forEach(loc=>{
+            const newKey = loc.replace("table","工作桌");
+            newLocations[newKey] = data.locations[loc];
+        });
+
+        data.locations = newLocations;
+
+        save(); // 存回 Firebase
 
         safeInit();
-        render();        
+        render();
     } else {
-        save(); 
+        save();
     }
 });
 
@@ -754,9 +764,9 @@ function select(loc){
 const fruit = data.locations[selected];  // ⭐ 補這行
         const ok = confirm(
           `เคลื่อนไหว_di chuyển_確定搬移？\n\n` +
-          `mold：${fruit}\n` +
-          `from：${selected}\n` +
-          `for ：${locKey}`
+          `治具：${fruit}\n` +
+          `從：${selected}\n` +
+          `移到 ：${locKey}`
         );
         if (!ok) {
     selected = null;   // ⭐ 清掉選取
@@ -1674,8 +1684,6 @@ function updateData(callback){
 </script>
 </body>
 </html>
-
-
 
 
 
