@@ -24,7 +24,7 @@
   border:none;
   border-radius:4px;
   font-size:14px;
-  padding:10px 10px;
+  padding:11px 11px;
   width:auto;
   cursor:pointer;
 }
@@ -49,7 +49,7 @@
       #399953 270deg 360deg
     ) 1;
 
-  animation:spinBorder 6s linear infinite;
+  animation:spinBorder 9s linear infinite;
 }
 
 @keyframes spinBorder{
@@ -595,37 +595,18 @@ rooms: {
 if (!Array.isArray(data.roomOrder) || !data.roomOrder.length) data.roomOrder = Object.keys(data.rooms);
 if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Object.keys(data.boxes);
 
-/* =====================================================
+//* =====================================================
    從雲端實時載入
 ===================================================== */
 
 database.ref("systemData").on("value", function(snapshot){
     if(snapshot.exists()){
         data = snapshot.val();
-
-        // ⭐ rooms table → 工作桌
-        Object.keys(data.rooms).forEach(room=>{
-            data.rooms[room] = data.rooms[room].map(t =>
-                t.replace("table","工作桌")
-            );
-        });
-
-        // ⭐ locations key table → 工作桌
-        const newLocations = {};
-
-        Object.keys(data.locations).forEach(loc=>{
-            const newKey = loc.replace("table","工作桌");
-            newLocations[newKey] = data.locations[loc];
-        });
-
-        data.locations = newLocations;
-
-        save(); // 存回 Firebase
-
         safeInit();
-        render();
+        render();        
     } else {
-        save();
+        // 第一次初始化
+        save(); 
     }
 });
 
@@ -1424,7 +1405,7 @@ function cell(locKey, displayName) {
   if (highlightFruits.includes(f)) d.classList.add('highlight');
   if (selected===locKey) d.classList.add('selected'); // 設定點擊事件
   if (locKey===newlyAddedLoc) d.classList.add('new-added');
-  d.textContent = `${displayName}: ${f || '(null)'}`;
+  d.textContent = `${displayName}: ${f || '無治具'}`;
   d.onclick = ()=>select(locKey);
   return d;
 }
@@ -1611,7 +1592,7 @@ pinnedCells.forEach(loc=>{
 
       const btn=document.createElement("button");
       btn.className="pinBtn";
-      btn.textContent="📌→❌";
+      btn.textContent="❌";
 
       btn.onclick=(e)=>{
         e.stopPropagation();
