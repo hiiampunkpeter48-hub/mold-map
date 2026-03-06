@@ -436,7 +436,7 @@ header {
   <!-- 第二排：搜尋 -->
   <div class="searchRow">
     <div class="searchBox">
-  <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu (Ex: B8R / B...)" autocomplete="off" />
+  <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu" autocomplete="off" />
 <div id="dropdown" class="dropdown hidden"></div>
   <button id="dropdownBtn" type="button">▼</button>
 <button onclick="doSearch()">🔍搜尋治具</button>
@@ -908,37 +908,49 @@ function zoomImage(img) {
 
 function userLogin() {
   const sel = document.getElementById('userSelect').value;
+
   if (!sel) {
     alert('โปรดเลือกผู้ใช้\n' +
-  'Vui lòng chọn người dùng\n' +
-  '請選擇使用者');
+      'Vui lòng chọn người dùng\n' +
+      '請選擇使用者');
     return;
   }
 
   currentUser = sel;
   lastActivity = Date.now();
-alert(`${currentUser} เข้าสู่ระบบแล้ว_Đã đăng nhập_已登入`);
 
-  // ⭐ 改登入按鈕文字
-  document.getElementById('userLoginBtn').textContent =
-    `👦User（${currentUser}）`;
+  alert(`${currentUser} เข้าสู่ระบบแล้ว_Đã đăng nhập_已登入`);
+
+  const btn = document.getElementById('userLoginBtn');
+
+  // ⭐ 按鈕文字變成 登出
+  btn.textContent = `👦 ${currentUser} | 🚪登出`;
+
+  // ⭐ 按鈕功能改成登出
+  btn.onclick = userLogout;
 
   render();
 }
 
+
 function userLogout() {
+
   if (!currentUser) return;
 
   alert(`${currentUser} ออกจากระบบ_Đăng xuất_已登出`);
 
   currentUser = null;
 
-  // ⭐ 重設人員選單回到「選擇人員」
-  const userSelect = document.getElementById('userSelect');
-  userSelect.value = '';
+  // 重設選單
+  document.getElementById('userSelect').value = '';
 
-  // ⭐ 還原登入按鈕文字
-  document.getElementById('userLoginBtn').textContent = '👦Login';
+  const btn = document.getElementById('userLoginBtn');
+
+  // ⭐ 還原按鈕文字
+  btn.textContent = '👦使用者登入';
+
+  // ⭐ 按鈕功能改回登入
+  btn.onclick = userLogin;
 
   render();
 }
@@ -1670,7 +1682,6 @@ function updateData(callback){
 </script>
 </body>
 </html>
-
 
 
 
