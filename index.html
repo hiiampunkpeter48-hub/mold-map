@@ -204,8 +204,8 @@ z-index:5;
 }
 
 .imageHint {
-  font-size: 16px;
-  height: 6px;
+  font-size: clamp(12px, 1.5vw, 20px); /* 最小12px，最大20px */
+  height: auto;
   color: #333;
 }
 
@@ -406,7 +406,7 @@ header {
  <!-- 此處為base64圖檔 -->
 <!-- 省略 -->
   </div>
-  <div class="imageHint">👆👆點圖放大_คลิกเพื่อขยายภาพ_Nhấp chuột để phóng to hình ảnh</div>
+  <div class="imageHint">👆點圖放大คลิกเพื่อขยายภาพ_Nhấp chuột để phóng to hình ảnh</div>
 </div>
 
   <!-- 第一排：使用者登入 -->
@@ -596,7 +596,7 @@ rooms: {
 if (!Array.isArray(data.roomOrder) || !data.roomOrder.length) data.roomOrder = Object.keys(data.rooms);
 if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Object.keys(data.boxes);
 
-/* =====================================================
+//* =====================================================
    從雲端實時載入
 ===================================================== */
 
@@ -1158,12 +1158,12 @@ function createSelector(title, items, prefixText) {
 
 // ===== rooms 選單 =====
 function openRoomSelector(){
-  createSelector("選取 rooms", data.roomOrder, "機台 ");
+  createSelector("選取 機台", data.roomOrder, "機台 ");
 }
 
 // ===== bxes 選單 =====
 function openBoxSelector(){
-  createSelector("選取 boxes", data.boxOrder, "治具架 ");
+  createSelector("選取 治具區", data.boxOrder, "治具架 ");
 }
 
 /* Console=btoa('abc789') */
@@ -1671,7 +1671,6 @@ function updateData(callback){
 </script>
 </body>
 </html>
-
 
 
 
