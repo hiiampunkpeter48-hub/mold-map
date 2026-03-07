@@ -99,77 +99,6 @@ z-index:5;
   margin: 6px 0;
 }
 
-
-/* ===== 搜尋框 ===== */
-
-.searchBox{
-  position: relative;
-  width: 250px;
-}
-
-/* 搜尋輸入 */
-
-#search{
-  width: 100%;
-  padding: 8px 35px 8px 10px;
-  font-size: 16px;
-}
-
-/* 箭頭按鈕 */
-
-.arrowBtn{
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-/* 箭頭形狀 */
-
-.arrowBtn::before{
-  content:"";
-  display:block;
-  width:8px;
-  height:8px;
-  border-right:3px solid #333;
-  border-bottom:3px solid #333;
-  transform: rotate(45deg);
-  margin:auto;
-}
-
-/* dropdown */
-
-.dropdown{
-  position:absolute;
-  top:100%;
-  left:0;
-  width:100%;
-  background:white;
-  border:1px solid #aaa;
-  max-height:300px;
-  overflow-y:auto;
-  z-index:999;
-}
-
-.dropdown div{
-  padding:10px;
-  border-bottom:1px solid #eee;
-  cursor:pointer;
-}
-
-.dropdown div:hover{
-  background:#f0f0f0;
-}
-
-.hidden{
-  display:none;
-}
-
 /* 📌 管理員控制列 (固定底部) */
 .adminBar {
   position: fixed;
@@ -506,11 +435,9 @@ header {
   <!-- 第二排：搜尋 -->
   <div class="searchRow">
     <div class="searchBox">
-  <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu" autocomplete="off">
-<button id="dropdownBtn" class="arrowBtn"></button>
+  <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu" autocomplete="off" />
 <div id="dropdown" class="dropdown hidden"></div>
-</div>
-  
+  <button id="dropdownBtn" type="button">▼</button>
 <button onclick="doSearch()">🔍搜尋治具</button>
 <button onclick="clearHighlight()">🧹清除搜尋</button></div>
   
@@ -707,15 +634,6 @@ firebase.database().ref(".info/connected")
             }, 5000);
         }
     }
-});
-
-
-// 監聽搜尋框輸入
-searchInput.addEventListener('input', () => {
-  if (!requireLogin()) return;   // ⭐ 先檢查登入
-  const key = searchInput.value.trim();
-  if (key) doSearch();
-  else render();
 });
 
 
@@ -1073,76 +991,64 @@ setInterval(() => {
   }
 }, 60 * 1000);
 
-// 抓元素
 const searchInput = document.getElementById('search');
 const dropdown = document.getElementById('dropdown');
 const dropdownBtn = document.getElementById('dropdownBtn');
 
-
-// 打字 → 搜尋
+// 打字 → 顯示建議
 searchInput.addEventListener('input', showDropdown);
 
+// 點箭頭 → 開關切換
+dropdownBtn.addEventListener('click', (e) => {
+  e.stopPropagation();   // 防止觸發 document 點擊事件
 
-// 點箭頭 → 展開全部
-dropdownBtn.addEventListener('click', e => {
-
-  e.stopPropagation();
-
-  if (dropdown.classList.contains('hidden')){
-
-    showDropdown(true);   // true = 顯示全部
-
+  if (dropdown.classList.contains('hidden')) {
+// ⭐ 移除清空行為
+//searchInput.value = ''; 
+    showDropdown();
   } else {
-
     dropdown.classList.add('hidden');
-
   }
-
 });
 
-// 下拉內容
-function showDropdown(showAll=false){
+// 點外面 → 關閉
+document.addEventListener('click', e => {
+  if (!e.target.closest('.searchBox')) {
+    dropdown.classList.add('hidden');
+  }
+});
 
+function showDropdown() {
   const key = searchInput.value.trim().toLowerCase();
+  dropdown.innerHTML = '';
 
-  dropdown.innerHTML='';
+  const sorted = data.fruits
+    .slice()
+    .sort((a, b) =>
+      a.localeCompare(b, undefined, { sensitivity: 'base' })
+    );
 
-  const sorted = data.fruits.slice().sort((a,b)=>
-    a.localeCompare(b,undefined,{sensitivity:'base'})
+  const matches = sorted.filter(f =>
+    f.toLowerCase().includes(key)
   );
 
-  const list = showAll
-    ? sorted
-    : sorted.filter(f => f.toLowerCase().includes(key));
-
-  if(!list.length){
+  if (!matches.length) {
     dropdown.classList.add('hidden');
     return;
   }
 
-  list.forEach(f => {
-
+  matches.forEach(f => {
     const item = document.createElement('div');
-
     item.textContent = f;
-
     item.onclick = () => {
-
       searchInput.value = f;
-
       dropdown.classList.add('hidden');
-      dropdownBtn.classList.remove('open');
-
       doSearch();
-
     };
-
     dropdown.appendChild(item);
-
   });
 
   dropdown.classList.remove('hidden');
-
 }
 
 // ===== 懸浮按鈕拖曳 =====
@@ -1285,52 +1191,6 @@ function adminLogin() {
     render();
   } else {
     alert('密碼錯誤');
-  }
-}
-
-
-/* ====== 自動觸發搜尋 ====== */
-
-
-
-
-
-function showDropdown(showAll=false){
-  const key = searchInput.value.trim().toLowerCase();
-  
-  dropdown.innerHTML = '';
-
-  const sorted = data.fruits.slice().sort((a,b)=>
-    a.localeCompare(b, undefined, {sensitivity:'base'})
-  );
-
-  const list = showAll
-    ? sorted
-    : sorted.filter(f => f.toLowerCase().includes(key));
-
-  if(!list.length){
-    dropdown.classList.add('hidden');
-    return;
-  }
-
-  list.forEach(f => {
-    const item = document.createElement('div');
-    item.textContent = f;
-
-    item.onclick = () => {
-      searchInput.value = f;
-      dropdown.classList.add('hidden');
-      doSearch(); // 點選才呼叫
-    };
-
-    dropdown.appendChild(item);
-  });
-
-  dropdown.classList.remove('hidden');
-
-  // ⭐ 如果使用者有輸入文字，自動觸發搜尋
-  if(key && !showAll){
-    doSearch();
   }
 }
 
