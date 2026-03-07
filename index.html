@@ -99,6 +99,16 @@ z-index:5;
   margin: 6px 0;
 }
 
+.arrowBtn {
+  font-size: 18px;
+  transition: transform 0.2s ease;
+}
+
+/* 展開狀態 */
+.arrowBtn.open {
+  transform: rotate(180deg);
+}
+
 /* 📌 管理員控制列 (固定底部) */
 .adminBar {
   position: fixed;
@@ -437,7 +447,7 @@ header {
     <div class="searchBox">
   <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu" autocomplete="off" />
 <div id="dropdown" class="dropdown hidden"></div>
-  <button id="dropdownBtn" type="button">▼</button>
+  <button id="dropdownBtn" type="button" class="arrowBtn">▼</button>
 <button onclick="doSearch()">🔍搜尋治具</button>
 <button onclick="clearHighlight()">🧹清除搜尋</button></div>
   
@@ -1003,20 +1013,19 @@ dropdownBtn.addEventListener('click', (e) => {
   e.stopPropagation();   // 防止觸發 document 點擊事件
 
   if (dropdown.classList.contains('hidden')) {
-// ⭐ 移除清空行為
-//searchInput.value = ''; 
-    showDropdown();
+
+    showDropdown();   // 打開清單
+    dropdownBtn.classList.add('open');   // ⭐旋轉箭頭
+
   } else {
+
     dropdown.classList.add('hidden');
+    dropdownBtn.classList.remove('open'); // ⭐轉回來
+
   }
 });
 
-// 點外面 → 關閉
-document.addEventListener('click', e => {
-  if (!e.target.closest('.searchBox')) {
-    dropdown.classList.add('hidden');
-  }
-});
+  if (dropdown.classList.contains('hidden')) {
 
 function showDropdown() {
   const key = searchInput.value.trim().toLowerCase();
