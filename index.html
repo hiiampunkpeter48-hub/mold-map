@@ -100,33 +100,74 @@ z-index:5;
 }
 
 
-/* ===== 治具一覽箭頭 ===== */
+/* ===== 搜尋框 ===== */
 
-.arrowBtn {
-  width: 24px;
-  height: 24px;
+.searchBox{
+  position: relative;
+  width: 250px;
+}
+
+/* 搜尋輸入 */
+
+#search{
+  width: 100%;
+  padding: 8px 35px 8px 10px;
+  font-size: 16px;
+}
+
+/* 箭頭按鈕 */
+
+.arrowBtn{
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
   border: none;
   background: none;
   cursor: pointer;
-  position: relative;
-  transition: transform 0.25s ease;
 }
 
 /* 箭頭形狀 */
-.arrowBtn::before {
-  content: "";
-  display: block;
-  width: 8px;
-  height: 8px;
-  border-right: 3px solid #333;
-  border-bottom: 3px solid #333;
+
+.arrowBtn::before{
+  content:"";
+  display:block;
+  width:8px;
+  height:8px;
+  border-right:3px solid #333;
+  border-bottom:3px solid #333;
   transform: rotate(45deg);
-  margin: auto;
+  margin:auto;
 }
 
-/* 展開時旋轉 */
-.arrowBtn.open {
-  transform: rotate(180deg);
+/* dropdown */
+
+.dropdown{
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+  background:white;
+  border:1px solid #aaa;
+  max-height:300px;
+  overflow-y:auto;
+  z-index:999;
+}
+
+.dropdown div{
+  padding:10px;
+  border-bottom:1px solid #eee;
+  cursor:pointer;
+}
+
+.dropdown div:hover{
+  background:#f0f0f0;
+}
+
+.hidden{
+  display:none;
 }
 
 /* 📌 管理員控制列 (固定底部) */
@@ -463,11 +504,13 @@ header {
 </div>
 
   <!-- 第二排：搜尋 -->
-  <div class="searchRow">
+  
     <div class="searchBox">
-  <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu" autocomplete="off" />
+  <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu" autocomplete="off">
+<button id="dropdownBtn" class="arrowBtn"></button>
 <div id="dropdown" class="dropdown hidden"></div>
-  <button id="dropdownBtn" class="arrowBtn"></button>
+</div>
+  
 <button onclick="doSearch()">🔍搜尋治具</button>
 <button onclick="clearHighlight()">🧹清除搜尋</button></div>
   
@@ -1026,58 +1069,71 @@ const searchInput = document.getElementById('search');
 const dropdown = document.getElementById('dropdown');
 const dropdownBtn = document.getElementById('dropdownBtn');
 
-// 打字 → 顯示建議
+
+// 打字 → 搜尋
 searchInput.addEventListener('input', showDropdown);
 
-// 點箭頭 → 開關切換
-dropdownBtn.addEventListener('click', (e) => {
-  e.stopPropagation();   // 防止觸發 document 點擊事件
 
-  if (dropdown.classList.contains('hidden')) {
+// 點箭頭 → 展開全部
+dropdownBtn.addEventListener('click', e => {
 
-    showDropdown();   // 打開清單
-    dropdownBtn.classList.add('open');   // ⭐旋轉箭頭
+  e.stopPropagation();
+
+  if (dropdown.classList.contains('hidden')){
+
+    showDropdown(true);   // true = 顯示全部
 
   } else {
 
     dropdown.classList.add('hidden');
-    dropdownBtn.classList.remove('open'); // ⭐轉回來
 
   }
+
 });
 
+// 下拉內容
+function showDropdown(showAll=false){
 
-function showDropdown() {
   const key = searchInput.value.trim().toLowerCase();
-  dropdown.innerHTML = '';
 
-  const sorted = data.fruits
-    .slice()
-    .sort((a, b) =>
-      a.localeCompare(b, undefined, { sensitivity: 'base' })
-    );
+  dropdown.innerHTML='';
 
-  const matches = sorted.filter(f =>
-    f.toLowerCase().includes(key)
+  const sorted = data.fruits.slice().sort((a,b)=>
+    a.localeCompare(b,undefined,{sensitivity:'base'})
   );
 
-  if (!matches.length) {
+  const list = showAll
+    ? sorted
+    : sorted.filter(f => f.toLowerCase().includes(key));
+
+  if(!list.length){
     dropdown.classList.add('hidden');
     return;
   }
 
-  matches.forEach(f => {
+  list.forEach(f => {
+
     const item = document.createElement('div');
+
     item.textContent = f;
+
     item.onclick = () => {
+
       searchInput.value = f;
+
       dropdown.classList.add('hidden');
+      dropdownBtn.classList.remove('open');
+
       doSearch();
+
     };
+
     dropdown.appendChild(item);
+
   });
 
   dropdown.classList.remove('hidden');
+
 }
 
 // ===== 懸浮按鈕拖曳 =====
