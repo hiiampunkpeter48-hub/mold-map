@@ -99,12 +99,32 @@ z-index:5;
   margin: 6px 0;
 }
 
+
+/* ===== 治具一覽箭頭 ===== */
+
 .arrowBtn {
-  font-size: 18px;
-  transition: transform 0.2s ease;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.25s ease;
 }
 
-/* 展開狀態 */
+/* 箭頭形狀 */
+.arrowBtn::before {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-right: 3px solid #333;
+  border-bottom: 3px solid #333;
+  transform: rotate(45deg);
+  margin: auto;
+}
+
+/* 展開時旋轉 */
 .arrowBtn.open {
   transform: rotate(180deg);
 }
@@ -447,7 +467,7 @@ header {
     <div class="searchBox">
   <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu" autocomplete="off" />
 <div id="dropdown" class="dropdown hidden"></div>
-  <button id="dropdownBtn" type="button" class="arrowBtn">▼</button>
+  <button id="dropdownBtn" class="arrowBtn"></button>
 <button onclick="doSearch()">🔍搜尋治具</button>
 <button onclick="clearHighlight()">🧹清除搜尋</button></div>
   
@@ -1001,6 +1021,7 @@ setInterval(() => {
   }
 }, 60 * 1000);
 
+// 抓元素
 const searchInput = document.getElementById('search');
 const dropdown = document.getElementById('dropdown');
 const dropdownBtn = document.getElementById('dropdownBtn');
