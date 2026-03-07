@@ -504,7 +504,6 @@ header {
 </div>
 
   <!-- 第二排：搜尋 -->
-
   <div class="searchRow">
     <div class="searchBox">
   <input id="search" placeholder="搜尋治具_ค้นหาแม่พิมพ์_Tìm kiếm khuôn mẫu" autocomplete="off">
@@ -708,6 +707,15 @@ firebase.database().ref(".info/connected")
             }, 5000);
         }
     }
+});
+
+
+// 監聽搜尋框輸入
+searchInput.addEventListener('input', () => {
+  if (!requireLogin()) return;   // ⭐ 先檢查登入
+  const key = searchInput.value.trim();
+  if (key) doSearch();
+  else render();
 });
 
 
@@ -1280,6 +1288,52 @@ function adminLogin() {
   }
 }
 
+
+/* ====== 自動觸發搜尋 ====== */
+
+
+
+
+
+function showDropdown(showAll=false){
+  const key = searchInput.value.trim().toLowerCase();
+  
+  dropdown.innerHTML = '';
+
+  const sorted = data.fruits.slice().sort((a,b)=>
+    a.localeCompare(b, undefined, {sensitivity:'base'})
+  );
+
+  const list = showAll
+    ? sorted
+    : sorted.filter(f => f.toLowerCase().includes(key));
+
+  if(!list.length){
+    dropdown.classList.add('hidden');
+    return;
+  }
+
+  list.forEach(f => {
+    const item = document.createElement('div');
+    item.textContent = f;
+
+    item.onclick = () => {
+      searchInput.value = f;
+      dropdown.classList.add('hidden');
+      doSearch(); // 點選才呼叫
+    };
+
+    dropdown.appendChild(item);
+  });
+
+  dropdown.classList.remove('hidden');
+
+  // ⭐ 如果使用者有輸入文字，自動觸發搜尋
+  if(key && !showAll){
+    doSearch();
+  }
+}
+
 /* ====== 搜尋 ====== */
 function doSearch() {
   if (!requireLogin()) return;
@@ -1767,7 +1821,6 @@ function updateData(callback){
 </script>
 </body>
 </html>
-
 
 
 
