@@ -923,7 +923,7 @@ function userLogin() {
   const btn = document.getElementById('userLoginBtn');
 
   // ⭐ 按鈕文字變成 登出
-  btn.textContent = `👦 ${currentUser} | 🚪登出`;
+  btn.textContent = `👦 ${currentUser} | 🚪登出_ออกจากระบบ_Đăng xuất`;
 
   // ⭐ 按鈕功能改成登出
   btn.onclick = userLogout;
@@ -946,7 +946,7 @@ function userLogout() {
   const btn = document.getElementById('userLoginBtn');
 
   // ⭐ 還原按鈕文字
-  btn.textContent = '👦使用者登入';
+  btn.textContent = '👦登入_เข้าสู่ระบบ_Đăng nhập';
 
   // ⭐ 按鈕功能改回登入
   btn.onclick = userLogin;
@@ -1681,6 +1681,7 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
 
 
