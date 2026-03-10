@@ -100,20 +100,20 @@ z-index:5;
 }
 
 /* 📌 下拉箭頭 */
-#dropdownBtn{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  cursor:pointer;
-  font-size:16px;
+#dropdownBtn {
+  display: inline-flex;   /* inline-flex 手機更穩定 */
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-#arrow{
-  font-size:22px;        /* 拉長箭頭 */
-  line-height:1;
-  transition:transform 0.25s;
+#arrow {
+  display: inline-block;  /* 讓 transform/文字可獨立 */
+  font-size: 22px;        /* 拉長箭頭，方向感更明顯 */
+  line-height: 1;
+  transition: transform 0.25s;
 }
-
 
 /* 📌 管理員控制列 (固定底部) */
 .adminBar {
@@ -1707,6 +1707,7 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
 
 
