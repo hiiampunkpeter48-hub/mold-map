@@ -1021,25 +1021,21 @@ searchInput.addEventListener('input', showDropdown);
 
 // 點箭頭 → 開關切換
 dropdownBtn.addEventListener('click', (e) => {
-  e.stopPropagation();   // 防止觸發 document 點擊事件
+  e.stopPropagation(); // 防止觸發 document 點擊事件
 
   if (dropdown.classList.contains('hidden')) {
-// ⭐ 移除清空行為
-//searchInput.value = ''; 
+    // 展開選單
+    // ⭐ 移除原本清空行為 searchInput.value = '';
     showDropdown();
-  } else {
-    dropdown.classList.add('hidden');
-  }
-});
-
-dropdown.classList.toggle('show');
-
-  if (dropdown.classList.contains('show')) {
+    dropdown.classList.remove('hidden');
     arrow.textContent = "▴";
     btnText.textContent = "點擊收合";
   } else {
+    // 收合選單
+    dropdown.classList.add('hidden');
     arrow.textContent = "▾";
     btnText.textContent = "點擊展開";
+  }
 });
 
 
@@ -1711,6 +1707,7 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
 
 
