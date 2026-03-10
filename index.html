@@ -454,7 +454,7 @@ header {
   <input id="search" placeholder="治具名稱_การระบุเชื้อรา_Mã định danh khuôn" autocomplete="off" />
 <div id="dropdown" class="dropdown hidden"></div>
   <button id="dropdownBtn" type="button">
-  <span id="arrow">▾</span>
+  <span id="arrow">▼</span>
   <span id="btnText">點擊展開_ขยาย_Mở rộng</span>
 </button>
 <button onclick="doSearch()">🔍搜尋_ค้นหา_tìm kiếm</button>
@@ -1029,12 +1029,12 @@ dropdownBtn.addEventListener('click', (e) => {
     showDropdown();
     dropdown.classList.remove('hidden');
     arrow.textContent = "▴";
-    btnText.textContent = "點擊收合";
+    btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
   } else {
     // 收合選單
     dropdown.classList.add('hidden');
     arrow.textContent = "▾";
-    btnText.textContent = "點擊展開";
+    btnText.textContent = "點擊展開_ขยาย_Mở rộng";
   }
 });
 
@@ -1056,7 +1056,7 @@ function showDropdown() {
 if (!matches.length) {
   dropdown.classList.add('hidden');
   arrow.textContent = "▾";
-  btnText.textContent = "點擊展開";
+  btnText.textContent = "點擊展開_ขยาย_Mở rộng";
   return;
 }
 
@@ -1074,7 +1074,7 @@ if (!matches.length) {
   dropdown.classList.remove('hidden');
 
 arrow.textContent = "▴";
-btnText.textContent = "點擊收合";
+btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
 }
 
 // ===== 懸浮按鈕拖曳 =====
@@ -1707,6 +1707,7 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
 
 
