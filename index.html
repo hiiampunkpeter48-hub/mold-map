@@ -1028,12 +1028,12 @@ dropdownBtn.addEventListener('click', (e) => {
     // ⭐ 移除原本清空行為 searchInput.value = '';
     showDropdown();
     dropdown.classList.remove('hidden');
-    arrow.textContent = "▴";
+    arrow.textContent = "▲";
     btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
   } else {
     // 收合選單
     dropdown.classList.add('hidden');
-    arrow.textContent = "▾";
+    arrow.textContent = "▼";
     btnText.textContent = "點擊展開_ขยาย_Mở rộng";
   }
 });
@@ -1055,7 +1055,7 @@ function showDropdown() {
 
 if (!matches.length) {
   dropdown.classList.add('hidden');
-  arrow.textContent = "▾";
+  arrow.textContent = "▼";
   btnText.textContent = "點擊展開_ขยาย_Mở rộng";
   return;
 }
@@ -1073,7 +1073,7 @@ if (!matches.length) {
 
   dropdown.classList.remove('hidden');
 
-arrow.textContent = "▴";
+arrow.textContent = "▲";
 btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
 }
 
@@ -1707,6 +1707,7 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
 
 
