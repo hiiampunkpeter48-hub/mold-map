@@ -1270,7 +1270,8 @@ if (hitLocs.length) {
     alert('查無治具');
   }
   // ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
-  document.getElementById('dropdown').classList.add('hidden');
+ document.getElementById('dropdown').classList.add('hidden');
+resetDropdownButton();
 }
 
 /* ====== 清除搜尋 ====== */
@@ -1279,7 +1280,16 @@ function clearHighlight() {
   document.getElementById('search').value = '';
 // 🔽 關閉箭頭展開
   document.getElementById('dropdown').classList.add('hidden');
-  render();
+resetDropdownButton();
+render();
+}
+
+function resetDropdownButton() {
+  const arrow = document.getElementById('arrow');
+  const btnText = document.getElementById('btnText');
+
+  if (arrow) arrow.textContent = "▾";
+  if (btnText) btnText.textContent = "點擊展開_ขยาย_Mở rộng";
 }
 
 /* ====== 新增治具 ====== */ 
