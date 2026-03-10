@@ -99,6 +99,22 @@ z-index:5;
   margin: 6px 0;
 }
 
+/* 📌 下拉箭頭 */
+#dropdownBtn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+  font-size:16px;
+}
+
+#arrow{
+  font-size:22px;        /* 拉長箭頭 */
+  line-height:1;
+  transition:transform 0.25s;
+}
+
+
 /* 📌 管理員控制列 (固定底部) */
 .adminBar {
   position: fixed;
@@ -437,7 +453,10 @@ header {
     <div class="searchBox">
   <input id="search" placeholder="治具名稱_การระบุเชื้อรา_Mã định danh khuôn" autocomplete="off" />
 <div id="dropdown" class="dropdown hidden"></div>
-  <button id="dropdownBtn" type="button">▼ 展開_ขยาย_Mở rộng</button>
+  <button id="dropdownBtn" type="button">
+  <span id="arrow">▾</span>
+  <span id="btnText">點擊展開_ขยาย_Mở rộng</span>
+</button>
 <button onclick="doSearch()">🔍搜尋_ค้นหา_tìm kiếm</button>
 <button onclick="clearHighlight()">🧹清除_ชัดเจน_Thông thoáng</button></div>
   
@@ -994,6 +1013,8 @@ setInterval(() => {
 const searchInput = document.getElementById('search');
 const dropdown = document.getElementById('dropdown');
 const dropdownBtn = document.getElementById('dropdownBtn');
+const arrow = document.getElementById('arrow');
+const btnText = document.getElementById('btnText');
 
 // 打字 → 顯示建議
 searchInput.addEventListener('input', showDropdown);
@@ -1011,12 +1032,17 @@ dropdownBtn.addEventListener('click', (e) => {
   }
 });
 
-// 點外面 → 關閉
-document.addEventListener('click', e => {
-  if (!e.target.closest('.searchBox')) {
-    dropdown.classList.add('hidden');
+dropdown.classList.toggle('show');
+
+  if (dropdown.classList.contains('show')) {
+    arrow.textContent = "▴";
+    btnText.textContent = "點擊收合";
+  } else {
+    arrow.textContent = "▾";
+    btnText.textContent = "點擊展開";
   }
 });
+
 
 function showDropdown() {
   const key = searchInput.value.trim().toLowerCase();
@@ -1032,10 +1058,12 @@ function showDropdown() {
     f.toLowerCase().includes(key)
   );
 
-  if (!matches.length) {
-    dropdown.classList.add('hidden');
-    return;
-  }
+if (!matches.length) {
+  dropdown.classList.add('hidden');
+  arrow.textContent = "▾";
+  btnText.textContent = "點擊展開";
+  return;
+}
 
   matches.forEach(f => {
     const item = document.createElement('div');
@@ -1049,6 +1077,9 @@ function showDropdown() {
   });
 
   dropdown.classList.remove('hidden');
+
+arrow.textContent = "▴";
+btnText.textContent = "點擊收合";
 }
 
 // ===== 懸浮按鈕拖曳 =====
@@ -1681,7 +1712,6 @@ function updateData(callback){
 </script>
 </body>
 </html>
-
 
 
 
