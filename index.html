@@ -10,7 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-/* 📌按鈕在格子右上角 */
+/* ➕按鈕在格子右上角 */
 .cell{
   position:relative;
 }
@@ -20,7 +20,6 @@
   top:1px;
   right:0px;
   background:#000;      /* 黑色 */
-  color:#fff;           /* 白字 */
   border:none;
   border-radius:4px;
   font-size:14px;
@@ -50,7 +49,7 @@ z-index:5;
       #399953 270deg 360deg
     ) 1;
 
-  animation:spinBorder 9s linear infinite;
+  animation:spinBorder 6s linear infinite;
 }
 
 @keyframes spinBorder{
@@ -566,10 +565,7 @@ rooms: {
   "E250":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
   "E260":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
   "E249":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
-  "E251":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
-  "預留1":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
-  "預留2":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
-  "預留3":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"]
+  "E251":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"]
 },
 
   boxes: {
@@ -591,7 +587,7 @@ rooms: {
   "Y41","Y42","Y43","Y44","Y45","Y46","Y47","Y48",
   "Y49","Y50","Y51","Y52","Y53","Y54","Y55","Y56",
   "Y57","Y58","Y59","Y60","Y61","Y62","Y63","Y64"],
-    "Z預留區":[
+    "Z預留區_ที่สงวนไว้_Kín đáo":[
   "Z1","Z2","Z3","Z4","Z5","Z6","Z7","Z8",
   "Z9","Z10","Z11","Z12","Z13","Z14","Z15","Z16",
   "Z17","Z18","Z19","Z20","Z21","Z22","Z23","Z24",
@@ -671,9 +667,9 @@ function save(){
 // ================= 操作 =================
 function requireLogin(){
   if(isAdmin){ lastActivity=Date.now(); return true; }
-  if(!currentUser){ alert('โปรดเลือกผู้ใช้\n' +
-  'Vui lòng chọn người dùng\n' +
-  '請選擇使用者'); return false; }
+  if(!currentUser){ alert('โปรดเข้าสู่ระบบในฐานะผู้ใช้\n' +
+  'Vui lòng đăng nhập với tư cách người dùng.\n' +
+  '請登入使用者'); return false; }
   lastActivity=Date.now();
   return true;
 }
@@ -813,7 +809,7 @@ render = function(){
 
         const btn=document.createElement("button");
         btn.className="pinBtn";
-        btn.textContent="❌";
+        btn.textContent="➖";
 
         btn.onclick=(e)=>{
           e.stopPropagation();
@@ -845,7 +841,7 @@ function createPinButton(loc){
   const fruit = data.locations[loc];
   if(!fruit) return;
 
-  // 如果已有❌就不建立
+  // 如果已有➖就不建立
   if(pinnedCells.has(loc)) return;
 
   // 如果已存在按鈕就不建立
@@ -853,7 +849,7 @@ function createPinButton(loc){
 
   const btn = document.createElement("button");
   btn.className="pinBtn";
-  btn.textContent="📌";
+  btn.textContent="➕";
 
   btn.onclick=(e)=>{
     e.stopPropagation();
@@ -884,8 +880,8 @@ function pinCell(loc){
   selected=null;
   hasMoved=false;
 
-  // 按鈕變📌→❌
-  btn.textContent="❌";
+  // 按鈕變➕→➖
+  btn.textContent="➖";
 
   btn.onclick=(e)=>{
     e.stopPropagation();
@@ -928,9 +924,9 @@ function userLogin() {
   const sel = document.getElementById('userSelect').value;
 
   if (!sel) {
-    alert('โปรดเลือกผู้ใช้\n' +
-      'Vui lòng chọn người dùng\n' +
-      '請選擇使用者');
+    alert('โปรดเข้าสู่ระบบในฐานะผู้ใช้\n' +
+      'Vui lòng đăng nhập với tư cách người dùng.\n' +
+      '請登入使用者');
     return;
   }
 
@@ -1644,7 +1640,7 @@ pinnedCells.forEach(loc=>{
 
       const btn=document.createElement("button");
       btn.className="pinBtn";
-      btn.textContent="❌";
+      btn.textContent="➖";
 
       btn.onclick=(e)=>{
         e.stopPropagation();
