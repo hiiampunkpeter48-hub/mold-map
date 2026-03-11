@@ -10,7 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <style>
-/* ➕按鈕在格子右上角 */
+/* ⊕按鈕在格子右上角 */
 .cell{
   position:relative;
 }
@@ -22,11 +22,11 @@
   background:#000;      /* 黑色 */
   border:none;
   border-radius:4px;
-  font-size:14px;
+  font-size:22px;
   padding:11px 11px;
   width:auto;
   cursor:pointer;
-z-index:10;
+z-index:5;
 }
 
 /* 📌邊框動畫 */
@@ -808,7 +808,7 @@ render = function(){
 
         const btn=document.createElement("button");
         btn.className="pinBtn";
-        btn.textContent="➖";
+        btn.textContent="⊖";
 
         btn.onclick=(e)=>{
           e.stopPropagation();
@@ -840,7 +840,7 @@ function createPinButton(loc){
   const fruit = data.locations[loc];
   if(!fruit) return;
 
-  // 如果已有➖就不建立
+  // 如果已有⊖就不建立
   if(pinnedCells.has(loc)) return;
 
   // 如果已存在按鈕就不建立
@@ -848,7 +848,7 @@ function createPinButton(loc){
 
   const btn = document.createElement("button");
   btn.className="pinBtn";
-  btn.textContent="➕";
+  btn.textContent="⊕";
 
   btn.onclick=(e)=>{
     e.stopPropagation();
@@ -879,8 +879,8 @@ function pinCell(loc){
   selected=null;
   hasMoved=false;
 
-  // 按鈕變➕→➖
-  btn.textContent="➖";
+  // 按鈕變⊕→⊖
+  btn.textContent="⊖";
 
   btn.onclick=(e)=>{
     e.stopPropagation();
@@ -1639,7 +1639,7 @@ pinnedCells.forEach(loc=>{
 
       const btn=document.createElement("button");
       btn.className="pinBtn";
-      btn.textContent="➖";
+      btn.textContent="⊖";
 
       btn.onclick=(e)=>{
         e.stopPropagation();
