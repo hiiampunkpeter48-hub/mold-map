@@ -1706,12 +1706,39 @@ function updateData(callback){
   // 不要 render()
 }
 
+firebase.database().ref("systemData").once("value").then(snapshot => {
+    const systemData = snapshot.val();
+    data.boxOrder = systemData.boxOrder || [];
+    data.boxes = systemData.boxes || {};
 
+    // ✅ 加入 Z區
+    if(!data.boxOrder.includes('Z預留區_ที่สงวนไว้_Kín đáo')){
+        data.boxOrder.push('Z預留區_ที่สงวนไว้_Kín đáo');
+    }
+
+    // 確保 Z區已經有格子資料
+    if(!data.boxes['Z預留區_ที่สงวนไว้_Kín đáo']){
+        data.boxes['Z預留區_ที่สงวนไว้_Kín đáo'] = [
+          "Z1","Z2","Z3","Z4","Z5","Z6","Z7","Z8",
+          "Z9","Z10","Z11","Z12","Z13","Z14","Z15","Z16",
+          "Z17","Z18","Z19","Z20","Z21","Z22","Z23","Z24",
+          "Z25","Z26","Z27","Z28","Z29","Z30","Z31","Z32",
+          "Z33","Z34","Z35","Z36","Z37","Z38","Z39","Z40",
+          "Z41","Z42","Z43","Z44","Z45","Z46","Z47","Z48",
+          "Z49","Z50","Z51","Z52","Z53","Z54","Z55","Z56",
+          "Z57","Z58","Z59","Z60","Z61","Z62","Z63","Z64"
+        ];
+    }
+
+    // ✅ 最後渲染
+    render();
+});
 
 
 </script>
 </body>
 </html>
+
 
 
 
