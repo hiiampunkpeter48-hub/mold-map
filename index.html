@@ -1291,56 +1291,55 @@ function resetDropdownButton() {
 /* ====== 新增治具 ====== */
 function addFruit() {
 
- if (!isAdmin) return alert('請先登入管理員');
+  if (!isAdmin) return alert('請先登入管理員');
 
- safeInit();
+  safeInit();
 
- const n = prompt('新增治具名稱');
- if (!n) return;
+  const n = prompt('新增治具名稱');
+  if (!n) return;
 
- if (data.fruits.includes(n))
-   return alert('名稱已存在');
+  if (data.fruits.includes(n))
+    return alert('名稱已存在');
 
- // ⭐ 找最後一個空位
- const emptyKey = Object.keys(data.locations)
-   .reverse()
-   .find(k => data.locations[k] === null);
+  // ⭐ 找最後一個空位
+  const emptyKey = Object.keys(data.locations)
+    .reverse()
+    .find(k => data.locations[k] === null);
 
- if (!emptyKey) return alert('目前沒有空位');
+  if (!emptyKey) return alert('目前沒有空位');
 
- data.fruits.push(n);
- data.locations[emptyKey] = n;
+  data.fruits.push(n);
+  data.locations[emptyKey] = n;
 
- // ⭐ 記錄新增位置
- newlyAddedLoc = emptyKey;
+  // ⭐ 記錄新增位置
+  newlyAddedLoc = emptyKey;
 
- // ⭐ 取消黃色選取
- selected = null;
+  // ⭐ 取消黃色選取
+  selected = null;
 
- save();
- render();
+  save();
+  render();
 
- const el = document.getElementById(`cell-${emptyKey}`);
+  const el = document.getElementById(`cell-${emptyKey}`);
 
- if (el) {
+  if (el) {
 
-   const rect = el.getBoundingClientRect();
-   const y = rect.top + window.scrollY;
+    const rect = el.getBoundingClientRect();
+    const y = rect.top + window.scrollY;
 
-   window.scrollTo({
-     top: y - window.innerHeight / 2 + rect.height / 2,
-     behavior: 'smooth'
-       
- setTimeout(() => {
- newlyAddedLoc = null;
- render();
- }, 5000);
-     
-   });
+    window.scrollTo({
+      top: y - window.innerHeight / 2 + rect.height / 2,
+      behavior: 'smooth'
+    });
 
- }
+    setTimeout(() => {
+      newlyAddedLoc = null;
+      render();
+    }, 5000);
 
   }
+
+}
 
 /* ====== 刪除治具 ====== */
 function removeFruit() {
@@ -1741,6 +1740,7 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
 
 
