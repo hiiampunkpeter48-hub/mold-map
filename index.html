@@ -1330,6 +1330,12 @@ function addFruit() {
    window.scrollTo({
      top: y - window.innerHeight / 2 + rect.height / 2,
      behavior: 'smooth'
+       
+ setTimeout(() => {
+ newlyAddedLoc = null;
+ render();
+ }, 5000);
+     
    });
 
  }
@@ -1735,6 +1741,7 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
 
 
