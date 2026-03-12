@@ -1457,8 +1457,9 @@ function importBackup() {
 }
 
 
-// ======  UI渲染 建立畫面格子  ======
+// ====== UI渲染 建立畫面格子 ======
 function cell(locKey, displayName) {
+
   const d = document.createElement('div');
   const f = data.locations[locKey]; // 讀取該位置的治具
 
@@ -1467,8 +1468,10 @@ function cell(locKey, displayName) {
 
   if (!f) d.classList.add('empty');
   if (highlightFruits.includes(f)) d.classList.add('highlight');
-  if (selected === locKey) d.classList.add('selected'); // ✅ 設定點擊事件
-  if (locKey === newlyAddedLoc) d.classList.add('new-added');
+  if (selected === locKey) d.classList.add('selected');
+
+  // ⭐ 新增治具紅光
+  if (locKey === newlyAddedLoc) d.classList.add('new-highlight');
 
   d.textContent = `${displayName}: ${f || '無治具'}`;
 
@@ -1673,13 +1676,6 @@ pinnedCells.forEach(loc => {
 
 });
 
-// 新增治具紅光
-if (locKey === newlyAddedLoc) {
-  cell.classList.add("new-highlight");
-}
-
-}
-
 
 // ================= 儲存搬移記錄 =================
 function writeLog(text){ // 最新在視窗最上面
@@ -1735,7 +1731,6 @@ function updateData(callback){
 </script>
 </body>
 </html>
-
 
 
 
