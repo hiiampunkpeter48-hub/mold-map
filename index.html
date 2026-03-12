@@ -139,13 +139,6 @@ z-index:5;
   cursor: pointer;
 }
 
-/* 📌 新增治具動畫效果 */
-.cell.new-added {
-  background-color: #7fd3ff;   /* 淺藍色，與選取黃區分 */
-  border-color: #1e90ff;
-  box-shadow: 0 0 36px rgba(30,144,255,0.9);
-}
-
 /* 📌 各區治具架標題顏色 */
 .boxes h3 {
   margin: 0 0 8px 0;
@@ -319,6 +312,12 @@ input, button, select { padding: 8px; font-size: 16px; }
 /* 白色 */
 .logWhite {
   color: #ffffff;
+}
+
+/* 📌 新增治具標示 */
+.cell.new-highlight {
+  border-color: #FF0000;
+  box-shadow: 0 0 36px rgba(255,0,0,0.9);
 }
 
 .admin { background: #eef; padding: 10px; margin-top: 10px; }
@@ -1289,31 +1288,50 @@ function resetDropdownButton() {
   if (btnText) btnText.textContent = "點擊展開_ขยาย_Mở rộng";
 }
 
-/* ====== 新增治具 ====== */ 
+/* ====== 新增治具 ====== */
 function addFruit() {
+
  if (!isAdmin) return alert('請先登入管理員');
+
  safeInit();
+
  const n = prompt('新增治具名稱');
  if (!n) return;
- if (data.fruits.includes(n)) return alert('名稱已存在');
 
- const emptyKey = Object.keys(data.locations).find(
- k => data.locations[k] === null
- );
+ if (data.fruits.includes(n))
+   return alert('名稱已存在');
+
+ // ⭐ 找最後一個空位
+ const emptyKey = Object.keys(data.locations)
+   .reverse()
+   .find(k => data.locations[k] === null);
+
  if (!emptyKey) return alert('目前沒有空位');
 
  data.fruits.push(n);
  data.locations[emptyKey] = n;
 
+ // ⭐ 記錄新增位置
  newlyAddedLoc = emptyKey;
- selected = emptyKey;
- save(); render(); document.getElementById(`cell-${emptyKey}`)
- ?.scrollIntoView({ behavior: 'smooth', block: 'center'
- });
- setTimeout(() => {
- newlyAddedLoc = null;
+
+ // ⭐ 取消黃色選取
+ selected = null;
+
+ save();
  render();
- }, 5000);
+
+ const el = document.getElementById(`cell-${emptyKey}`);
+
+ if (el) {
+
+   const rect = el.getBoundingClientRect();
+   const y = rect.top + window.scrollY;
+
+   window.scrollTo({
+     top: y - window.innerHeight / 2 + rect.height / 2,
+     behavior: 'smooth'
+   });
+
  }
 
 /* ====== 刪除治具 ====== */
@@ -1655,6 +1673,10 @@ pinnedCells.forEach(loc=>{
 
 });
 
+}
+
+if (locKey === newlyAddedLoc) {
+  cell.classList.add("new-highlight");
 }
 
 
