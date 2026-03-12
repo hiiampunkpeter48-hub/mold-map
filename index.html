@@ -1647,21 +1647,21 @@ if(selected){
 }
 
 // ⭐恢復已釘選格子 (避免render洗掉)
-pinnedCells.forEach(loc=>{
+pinnedCells.forEach(loc => {
 
   const cellDiv = document.getElementById(`cell-${loc}`);
 
-  if(cellDiv){
+  if (cellDiv) {
 
     cellDiv.classList.add("pinned");
 
-    if(!cellDiv.querySelector(".pinBtn")){
+    if (!cellDiv.querySelector(".pinBtn")) {
 
-      const btn=document.createElement("button");
-      btn.className="pinBtn";
-      btn.textContent="❌";
+      const btn = document.createElement("button");
+      btn.className = "pinBtn";
+      btn.textContent = "❌";
 
-      btn.onclick=(e)=>{
+      btn.onclick = (e) => {
         e.stopPropagation();
         unpinCell(loc);
       };
@@ -1673,8 +1673,7 @@ pinnedCells.forEach(loc=>{
 
 });
 
-}
-
+// ⭐新增治具紅色標示
 if (locKey === newlyAddedLoc) {
   cell.classList.add("new-highlight");
 }
