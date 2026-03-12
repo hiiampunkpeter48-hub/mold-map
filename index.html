@@ -1473,6 +1473,9 @@ function cell(locKey, displayName) {
   if (selected === locKey) d.classList.add('selected'); // ✅ 設定點擊事件
   if (locKey === newlyAddedLoc) d.classList.add('new-added');
 
+  // ⭐ 新增治具紅光
+  if (locKey === newlyAddedLoc) d.classList.add('new-highlight');
+  
   d.textContent = `${displayName}: ${f || '無治具'}`;
 
   d.onclick = () => select(locKey);
@@ -1733,6 +1736,7 @@ function updateData(callback){
 </script>
 </body>
 </html>
+
 
 
 
