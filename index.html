@@ -872,7 +872,7 @@ function createPinButton(loc){
 
 
 // 釘選
-function pinCell(loc){
+function pinCell(loc, skipSelect=false){
 
   const cell = document.getElementById(`cell-${loc}`);
   if(!cell) return;
@@ -883,22 +883,22 @@ function pinCell(loc){
 
   cell.classList.add("pinned");
 
-  // 恢復原本顏色
-  cell.classList.remove("selected");
+  // ⭐只有搜尋才跳過黃色
+  if(skipSelect){
+    cell.classList.remove("selected");
+    selected = null;
+  }
 
-  // 清除選取
-  selected=null;
-  hasMoved=false;
+  if(btn){
+    btn.textContent="❌";
+    btn.onclick=(e)=>{
+      e.stopPropagation();
+      unpinCell(loc);
+    };
+  }
 
-  // 按鈕變📌→❌
-  btn.textContent="❌";
+  updatePrepareArea();
 
-  btn.onclick=(e)=>{
-    e.stopPropagation();
-    unpinCell(loc);
-  };
-
-updatePrepareArea();
 }
 
 
@@ -1260,9 +1260,9 @@ function doSearch() {
   }
 
   // ⭐直接釘選
-  hits.forEach(loc=>{
-    pinCell(loc);
-  });
+hits.forEach(loc=>{
+  pinCell(loc,true);
+});
 
   render();
 
@@ -1759,7 +1759,7 @@ function updatePrepareArea(){
 
   grid.innerHTML="";
 
-  // 1️⃣ 釘選治具
+  // 釘選治具
   pinnedCells.forEach(loc=>{
 
     const f = data.locations[loc];
@@ -1771,20 +1771,25 @@ function updatePrepareArea(){
     grid.appendChild(d);
   });
 
-  // 2️⃣ 所有空格
-  Object.keys(data.locations).forEach(loc=>{
+  // 選取無治具
+Object.keys(data.locations).forEach(loc=>{
 
-    if(data.locations[loc]===null){
+  if(data.locations[loc]===null){
 
-      const d = cell(loc, loc);
-      d.classList.add("empty");
+    // ⭐排除機台
+    if(loc.includes("M")) return;
 
-      grid.appendChild(d);
-    }
+    // ⭐排除Z架
+    if(loc.startsWith("Z")) return;
 
-  });
+    const d = cell(loc, loc);
+    d.classList.add("empty");
 
-}
+    grid.appendChild(d);
+
+  }
+
+});
 
 // 清空準備區
 function clearPrepareArea(){
