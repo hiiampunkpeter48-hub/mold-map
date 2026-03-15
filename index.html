@@ -1766,7 +1766,7 @@ function updatePrepareArea(){
     if(!f) return;
 
     const d = cell(loc, loc);
-    d.classList.add("selected");
+    d.classList.add("pinned");
 
     grid.appendChild(d);
   });
@@ -1790,6 +1790,8 @@ Object.keys(data.locations).forEach(loc=>{
   }
 
 });
+
+}
 
 // 清空準備區
 function clearPrepareArea(){
