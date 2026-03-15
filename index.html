@@ -459,6 +459,15 @@ header {
 </button>
 <button onclick="doSearch()">🔍搜尋_ค้นหา_tìm kiếm</button>
 <button onclick="clearHighlight()">🧹清除_ชัดเจน_Thông thoáng</button></div>
+<!-- ===== 搬移準備區 ===== -->
+<div id="prepareArea" class="boxes">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <h3>搬移準備區</h3>
+    <button onclick="clearPrepareArea()">清空準備區</button>
+  </div>
+
+  <div id="prepareGrid" class="grid"></div>
+</div>
   
 
 <div id="board"></div>
@@ -539,6 +548,7 @@ let isAdmin = false;
 let pendingClear = false;
 let currentUser = null;
 let lastActivity = Date.now();
+let prepareCells = new Set();
 
 /* =====================================================
    全域資料（取代 localStorage）
@@ -887,6 +897,8 @@ function pinCell(loc){
     e.stopPropagation();
     unpinCell(loc);
   };
+
+updatePrepareArea();
 }
 
 
@@ -903,6 +915,8 @@ function unpinCell(loc){
   cell.classList.remove("pinned");
 
   if(btn) btn.remove();
+
+updatePrepareArea();
 }
 
 // 📌 圖片放大功能 -->
@@ -1218,54 +1232,43 @@ function adminLogin() {
 
 /* ====== 搜尋 ====== */
 function doSearch() {
+
   if (!requireLogin()) return;
 
   const key = document.getElementById('search').value.trim().toLowerCase();
-  highlightFruits = [];
-  let hitLocs = [];
-
-  if (!key) {
-    render();
-    return;
-  }
+  if(!key) return;
 
   const exact = [];
   const fuzzy = [];
 
-  Object.entries(data.locations).forEach(([loc, fruit]) => {
-    if (!fruit) return;
+  Object.entries(data.locations).forEach(([loc, fruit])=>{
+
+    if(!fruit) return;
+
     const f = fruit.toLowerCase();
-    if (f === key) exact.push({ loc, fruit });
-    else if (f.includes(key)) fuzzy.push({ loc, fruit });
+
+    if(f === key) exact.push(loc);
+    else if(f.includes(key)) fuzzy.push(loc);
+
   });
 
   const hits = exact.length ? exact : fuzzy;
-  highlightFruits = hits.map(h => h.fruit);
-  hitLocs = hits.map(h => h.loc);
 
-render();
-
-if (hitLocs.length) {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-
-      const el = document.getElementById(`cell-${hitLocs[0]}`);
-      if (!el) return;
-
-      const rect = el.getBoundingClientRect();
-      const y = rect.top + window.scrollY;
-
-      window.scrollTo({
-        top: y - window.innerHeight / 2 + rect.height / 2,
-        behavior: 'smooth'
-      });
-
-    });
-  });
-} else {
-    alert('查無治具');
+  if(!hits.length){
+    alert("查無治具");
+    return;
   }
-  // ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
+
+  // ⭐直接釘選
+  hits.forEach(loc=>{
+    pinCell(loc);
+  });
+
+  render();
+
+}
+
+// ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
  document.getElementById('dropdown').classList.add('hidden');
 resetDropdownButton();
 }
@@ -1683,6 +1686,8 @@ pinnedCells.forEach(loc=>{
 
 });
 
+updatePrepareArea();
+
 }
 
 
@@ -1746,6 +1751,52 @@ function showPinOnCell(locKey){
   pin.className = "pin";
 
   cell.appendChild(pin);
+
+}
+
+function updatePrepareArea(){
+
+  const grid = document.getElementById("prepareGrid");
+  if(!grid) return;
+
+  grid.innerHTML="";
+
+  // 1️⃣ 釘選治具
+  pinnedCells.forEach(loc=>{
+
+    const f = data.locations[loc];
+    if(!f) return;
+
+    const d = cell(loc, loc);
+    d.classList.add("selected");
+
+    grid.appendChild(d);
+  });
+
+  // 2️⃣ 所有空格
+  Object.keys(data.locations).forEach(loc=>{
+
+    if(data.locations[loc]===null){
+
+      const d = cell(loc, loc);
+      d.classList.add("empty");
+
+      grid.appendChild(d);
+    }
+
+  });
+
+}
+
+// 清空準備區
+function clearPrepareArea(){
+
+  pinnedCells.clear();
+
+  const grid = document.getElementById("prepareGrid");
+  if(grid) grid.innerHTML="";
+
+  render();
 
 }
 
