@@ -877,26 +877,32 @@ function pinCell(loc, skipSelect=false){
   const cell = document.getElementById(`cell-${loc}`);
   if(!cell) return;
 
-  const btn = cell.querySelector(".pinBtn");
-
   pinnedCells.add(loc);
 
   cell.classList.add("pinned");
 
-  // ⭐ 不管手動或搜尋，都移除選取狀態
+  // ⭐ 永遠移除選取狀態
   cell.classList.remove("selected");
   selected = null;
 
-  if(btn){
-    btn.textContent="❌";
-    btn.onclick=(e)=>{
-      e.stopPropagation();
-      unpinCell(loc);
-    };
+  // ===== 建立或取得按鈕 =====
+  let btn = cell.querySelector(".pinBtn");
+
+  if(!btn){
+    btn = document.createElement("button");
+    btn.className = "pinBtn";
+    cell.appendChild(btn);
   }
 
-  updatePrepareArea();
+  // ===== 設定按鈕 =====
+  btn.textContent = "❌";
 
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    unpinCell(loc);
+  };
+
+  updatePrepareArea();
 }
 
 
@@ -1649,33 +1655,6 @@ if(selected){
   createPinButton(selected);
 }
 
-// ⭐恢復已釘選格子 (避免render洗掉)
-pinnedCells.forEach(loc=>{
-
-  const cellDiv = document.getElementById(`cell-${loc}`);
-
-  if(cellDiv){
-
-    cellDiv.classList.add("pinned");
-
-    if(!cellDiv.querySelector(".pinBtn")){
-
-      const btn=document.createElement("button");
-      btn.className="pinBtn";
-      btn.textContent="❌";
-
-      btn.onclick=(e)=>{
-        e.stopPropagation();
-        unpinCell(loc);
-      };
-
-      cellDiv.appendChild(btn);
-    }
-
-  }
-
-});
-
 updatePrepareArea();
 
 }
@@ -1755,9 +1734,6 @@ function updatePrepareArea(){
   // 先顯示釘選治具
   // =========================
   pinnedCells.forEach(loc=>{
-
-    const f = data.locations[loc];
-    if(!f) return;
 
     const d = cell(loc, loc);
     d.classList.add("pinned");
