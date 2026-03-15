@@ -883,11 +883,9 @@ function pinCell(loc, skipSelect=false){
 
   cell.classList.add("pinned");
 
-  // ⭐只有搜尋才跳過黃色
-  if(skipSelect){
-    cell.classList.remove("selected");
-    selected = null;
-  }
+  // ⭐ 不管手動或搜尋，都移除選取狀態
+  cell.classList.remove("selected");
+  selected = null;
 
   if(btn){
     btn.textContent="❌";
@@ -1261,7 +1259,7 @@ function doSearch() {
 
   // ⭐直接釘選
 hits.forEach(loc=>{
-  pinCell(loc,true);
+  pinCell(loc);
 });
 
   render();
@@ -1648,13 +1646,7 @@ function render() {
 
 // ⭐render後補上釘選按鈕
 if(selected){
-
-  const fruit = data.locations[selected];
-
-  if(fruit){
-    createPinButton(selected);
-  }
-
+  createPinButton(selected);
 }
 
 // ⭐恢復已釘選格子 (避免render洗掉)
@@ -1771,13 +1763,13 @@ function updatePrepareArea(){
     grid.appendChild(d);
   });
 
-  // 選取無治具
+// 選取無治具
 Object.keys(data.locations).forEach(loc=>{
 
   if(data.locations[loc]===null){
 
-    // ⭐排除機台
-    if(loc.includes("M")) return;
+    // ⭐排除機台（有 "|" 的都是機台）
+    if(loc.includes("|")) return;
 
     // ⭐排除Z架
     if(loc.startsWith("Z")) return;
@@ -1790,8 +1782,6 @@ Object.keys(data.locations).forEach(loc=>{
   }
 
 });
-
-}
 
 // 清空準備區
 function clearPrepareArea(){
