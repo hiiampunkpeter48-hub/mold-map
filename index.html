@@ -1736,6 +1736,19 @@ function updateData(callback){
   // 不要 render()
 }
 
+function showPinOnCell(locKey){
+
+  const cell = document.querySelector(`[data-key="${locKey}"]`);
+  if(!cell) return;
+
+  const pin = document.createElement("div");
+  pin.textContent = "📌";
+  pin.className = "pin";
+
+  cell.appendChild(pin);
+
+}
+
 
 </script>
 </body>
