@@ -1751,7 +1751,9 @@ function updatePrepareArea(){
 
   grid.innerHTML="";
 
-  // 釘選治具
+  // =========================
+  // 先顯示釘選治具
+  // =========================
   pinnedCells.forEach(loc=>{
 
     const f = data.locations[loc];
@@ -1763,25 +1765,32 @@ function updatePrepareArea(){
     grid.appendChild(d);
   });
 
-// 選取無治具
-Object.keys(data.locations).forEach(loc=>{
+  // =========================
+  // 只有釘選才顯示空位
+  // =========================
+  if(pinnedCells.size > 0){
 
-  if(data.locations[loc]===null){
+    Object.keys(data.locations).forEach(loc=>{
 
-    // ⭐排除機台（有 "|" 的都是機台）
-    if(loc.includes("|")) return;
+      // 只顯示空格
+      if(data.locations[loc] !== null) return;
 
-    // ⭐排除Z架
-    if(loc.startsWith("Z")) return;
+      // 排除機台
+      if(loc.includes("|")) return;
 
-    const d = cell(loc, loc);
-    d.classList.add("empty");
+      // 排除Z治具架
+      if(loc.startsWith("Z")) return;
 
-    grid.appendChild(d);
+      const d = cell(loc, loc);
+      d.classList.add("empty");
+
+      grid.appendChild(d);
+
+    });
 
   }
 
-});
+}
 
 // 清空準備區
 function clearPrepareArea(){
