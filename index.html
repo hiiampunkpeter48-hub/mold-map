@@ -1469,28 +1469,55 @@ function importBackup() {
 }
 
 
-// ======  UI渲染 建立畫面格子  ======
+
+
 function cell(locKey, displayName) {
+
   const d = document.createElement('div');
-  const f = data.locations[locKey]; // 讀取該位置的治具
+  const f = data.locations[locKey];
 
   d.className = 'cell';
   d.id = `cell-${locKey}`;
 
-  if (!f) d.classList.add('empty');
-  if (highlightFruits.includes(f)) d.classList.add('highlight');
-  if (selected === locKey) d.classList.add('selected'); // ✅ 設定點擊事件
-  if (locKey === newlyAddedLoc) d.classList.add('new-added');
-
-  // ⭐ 新增治具紅光
-  if (locKey === newlyAddedLoc) d.classList.add('new-highlight');
-  
+  // 文字
   d.textContent = `${displayName}: ${f || '無治具'}`;
+
+  // 原本顏色
+  if (f) d.classList.add('hasFruit');
+  else d.classList.add('empty');
+
+  // ⭐ 釘選狀態
+  if (pinnedCells.has(locKey)) {
+
+    d.classList.add("pinned");
+
+    const btn = document.createElement("button");
+    btn.className = "pinBtn";
+    btn.textContent = "❌";
+
+    btn.onclick = (e)=>{
+      e.stopPropagation();
+      unpinCell(locKey);
+    };
+
+    d.appendChild(btn);
+  }
+
+  // 選取
+  if (selected === locKey) {
+    d.classList.add("selected");
+  }
+
+  // 新增治具紅光
+  if (locKey === newlyAddedLoc) {
+    d.classList.add('new-highlight');
+  }
 
   d.onclick = () => select(locKey);
 
   return d;
 }
+
 
 
 // ============ 防止同一個治具出現在兩個位置 ============
