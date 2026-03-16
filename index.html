@@ -674,6 +674,8 @@ function save(){
 /* =====================================================
    核心功能區
 ===================================================== */
+const prepareCells = new Set();
+
 // ================= 操作 =================
 function requireLogin(){
   if(isAdmin){ lastActivity=Date.now(); return true; }
@@ -909,18 +911,34 @@ function pinCell(loc, skipSelect=false){
 // 取消釘選
 function unpinCell(loc){
 
-  const cell = document.getElementById(`cell-${loc}`);
-  if(!cell) return;
-
-  const btn = cell.querySelector(".pinBtn");
-
   pinnedCells.delete(loc);
 
-  cell.classList.remove("pinned");
+  render();
+  updatePrepareArea();
 
-  if(btn) btn.remove();
+}
 
-updatePrepareArea();
+
+// pin 統一
+function pinCell(loc){
+
+  pinnedCells.add(loc);
+  prepareCells.add(loc);
+
+  render();
+  updatePrepareArea();
+
+}
+
+// unpin 統一
+function unpinCell(loc){
+
+  pinnedCells.delete(loc);
+  prepareCells.delete(loc);
+
+  render();
+  updatePrepareArea();
+
 }
 
 // 📌 圖片放大功能 -->
@@ -1470,7 +1488,7 @@ function importBackup() {
 
 
 
-
+// ====== cell() ======
 function cell(locKey, displayName) {
 
   const d = document.createElement('div');
@@ -1479,20 +1497,23 @@ function cell(locKey, displayName) {
   d.className = 'cell';
   d.id = `cell-${locKey}`;
 
-  // 文字
+  // 文字（先放，避免清掉按鈕）
   d.textContent = `${displayName}: ${f || '無治具'}`;
 
   // 原本顏色
   if (f) d.classList.add('hasFruit');
   else d.classList.add('empty');
 
-  // ⭐ 釘選狀態
-  if (pinnedCells.has(locKey)) {
+  // 是否已釘選
+  const pinned = pinnedCells.has(locKey);
+
+  // 建立按鈕
+  const btn = document.createElement("button");
+  btn.className = "pinBtn";
+
+  if(pinned){
 
     d.classList.add("pinned");
-
-    const btn = document.createElement("button");
-    btn.className = "pinBtn";
     btn.textContent = "❌";
 
     btn.onclick = (e)=>{
@@ -1500,8 +1521,18 @@ function cell(locKey, displayName) {
       unpinCell(locKey);
     };
 
-    d.appendChild(btn);
+  }else{
+
+    btn.textContent = "📌";
+
+    btn.onclick = (e)=>{
+      e.stopPropagation();
+      pinCell(locKey);
+    };
+
   }
+
+  d.appendChild(btn);
 
   // 選取
   if (selected === locKey) {
@@ -1517,7 +1548,6 @@ function cell(locKey, displayName) {
 
   return d;
 }
-
 
 
 // ============ 防止同一個治具出現在兩個位置 ============
@@ -1775,8 +1805,13 @@ function updatePrepareArea(){
 
     Object.keys(data.locations).forEach(loc=>{
 
-      // 只顯示空格
-      if(data.locations[loc] !== null) return;
+      // 顯示空格 空位→變治具 仍保留
+      prepareCells.forEach(loc=>{
+
+  const d = cell(loc, loc);
+  grid.appendChild(d);
+
+});
 
       // 排除機台
       if(loc.includes("|")) return;
