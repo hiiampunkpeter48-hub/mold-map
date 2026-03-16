@@ -459,15 +459,6 @@ header {
 </button>
 <button onclick="doSearch()">🔍搜尋_ค้นหา_tìm kiếm</button>
 <button onclick="clearHighlight()">🧹清除_ชัดเจน_Thông thoáng</button></div>
-<!-- ===== 搬移準備區 ===== -->
-<div id="prepareArea" class="boxes">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <h3>搬移準備區</h3>
-    <button onclick="clearPrepareArea()">清空準備區</button>
-  </div>
-
-  <div id="prepareGrid" class="grid"></div>
-</div>
   
 
 <div id="board"></div>
@@ -548,7 +539,6 @@ let isAdmin = false;
 let pendingClear = false;
 let currentUser = null;
 let lastActivity = Date.now();
-let prepareCells = new Set();
 
 /* =====================================================
    全域資料（取代 localStorage）
@@ -674,7 +664,6 @@ function save(){
 /* =====================================================
    核心功能區
 ===================================================== */
-
 // ================= 操作 =================
 function requireLogin(){
   if(isAdmin){ lastActivity=Date.now(); return true; }
@@ -873,71 +862,47 @@ function createPinButton(loc){
 
 
 // 釘選
-function pinCell(loc, skipSelect=false){
+function pinCell(loc){
 
   const cell = document.getElementById(`cell-${loc}`);
   if(!cell) return;
+
+  const btn = cell.querySelector(".pinBtn");
 
   pinnedCells.add(loc);
 
   cell.classList.add("pinned");
 
-  // ⭐ 永遠移除選取狀態
+  // 恢復原本顏色
   cell.classList.remove("selected");
-  selected = null;
 
-  // ===== 建立或取得按鈕 =====
-  let btn = cell.querySelector(".pinBtn");
+  // 清除選取
+  selected=null;
+  hasMoved=false;
 
-  if(!btn){
-    btn = document.createElement("button");
-    btn.className = "pinBtn";
-    cell.appendChild(btn);
-  }
+  // 按鈕變📌→❌
+  btn.textContent="❌";
 
-  // ===== 設定按鈕 =====
-  btn.textContent = "❌";
-
-  btn.onclick = (e) => {
+  btn.onclick=(e)=>{
     e.stopPropagation();
     unpinCell(loc);
   };
-
-  updatePrepareArea();
 }
 
 
 // 取消釘選
 function unpinCell(loc){
 
-  pinnedCells.delete(loc);
+  const cell = document.getElementById(`cell-${loc}`);
+  if(!cell) return;
 
-  render();
-  updatePrepareArea();
-
-}
-
-
-// pin 統一
-function pinCell(loc){
-
-  pinnedCells.add(loc);
-  prepareCells.add(loc);
-
-  render();
-  updatePrepareArea();
-
-}
-
-// unpin 統一
-function unpinCell(loc){
+  const btn = cell.querySelector(".pinBtn");
 
   pinnedCells.delete(loc);
-  prepareCells.delete(loc);
 
-  render();
-  updatePrepareArea();
+  cell.classList.remove("pinned");
 
+  if(btn) btn.remove();
 }
 
 // 📌 圖片放大功能 -->
@@ -1253,41 +1218,54 @@ function adminLogin() {
 
 /* ====== 搜尋 ====== */
 function doSearch() {
-
   if (!requireLogin()) return;
 
   const key = document.getElementById('search').value.trim().toLowerCase();
-  if(!key) return;
+  highlightFruits = [];
+  let hitLocs = [];
+
+  if (!key) {
+    render();
+    return;
+  }
 
   const exact = [];
   const fuzzy = [];
 
-  Object.entries(data.locations).forEach(([loc, fruit])=>{
-
-    if(!fruit) return;
-
+  Object.entries(data.locations).forEach(([loc, fruit]) => {
+    if (!fruit) return;
     const f = fruit.toLowerCase();
-
-    if(f === key) exact.push(loc);
-    else if(f.includes(key)) fuzzy.push(loc);
-
+    if (f === key) exact.push({ loc, fruit });
+    else if (f.includes(key)) fuzzy.push({ loc, fruit });
   });
 
   const hits = exact.length ? exact : fuzzy;
+  highlightFruits = hits.map(h => h.fruit);
+  hitLocs = hits.map(h => h.loc);
 
-  if(!hits.length){
-    alert("查無治具");
-    return;
+render();
+
+if (hitLocs.length) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+
+      const el = document.getElementById(`cell-${hitLocs[0]}`);
+      if (!el) return;
+
+      const rect = el.getBoundingClientRect();
+      const y = rect.top + window.scrollY;
+
+      window.scrollTo({
+        top: y - window.innerHeight / 2 + rect.height / 2,
+        behavior: 'smooth'
+      });
+
+    });
+  });
+} else {
+    alert('查無治具');
   }
-
-  // ⭐直接釘選
-hits.forEach(loc=>{
-  pinCell(loc);
-});
-
-  render();
-
-// ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
+  // ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
  document.getElementById('dropdown').classList.add('hidden');
 resetDropdownButton();
 }
@@ -1486,62 +1464,23 @@ function importBackup() {
 }
 
 
-
-// ====== cell() ======
+// ======  UI渲染 建立畫面格子  ======
 function cell(locKey, displayName) {
-
   const d = document.createElement('div');
-  const f = data.locations[locKey];
+  const f = data.locations[locKey]; // 讀取該位置的治具
 
   d.className = 'cell';
   d.id = `cell-${locKey}`;
 
-  // 文字（先放，避免清掉按鈕）
+  if (!f) d.classList.add('empty');
+  if (highlightFruits.includes(f)) d.classList.add('highlight');
+  if (selected === locKey) d.classList.add('selected'); // ✅ 設定點擊事件
+  if (locKey === newlyAddedLoc) d.classList.add('new-added');
+
+  // ⭐ 新增治具紅光
+  if (locKey === newlyAddedLoc) d.classList.add('new-highlight');
+  
   d.textContent = `${displayName}: ${f || '無治具'}`;
-
-  // 原本顏色
-  if (f) d.classList.add('hasFruit');
-  else d.classList.add('empty');
-
-  // 是否已釘選
-  const pinned = pinnedCells.has(locKey);
-
-  // 建立按鈕
-  const btn = document.createElement("button");
-  btn.className = "pinBtn";
-
-  if(pinned){
-
-    d.classList.add("pinned");
-    btn.textContent = "❌";
-
-    btn.onclick = (e)=>{
-      e.stopPropagation();
-      unpinCell(locKey);
-    };
-
-  }else{
-
-    btn.textContent = "📌";
-
-    btn.onclick = (e)=>{
-      e.stopPropagation();
-      pinCell(locKey);
-    };
-
-  }
-
-  d.appendChild(btn);
-
-  // 選取
-  if (selected === locKey) {
-    d.classList.add("selected");
-  }
-
-  // 新增治具紅光
-  if (locKey === newlyAddedLoc) {
-    d.classList.add('new-highlight');
-  }
 
   d.onclick = () => select(locKey);
 
@@ -1708,10 +1647,41 @@ function render() {
 
 // ⭐render後補上釘選按鈕
 if(selected){
-  createPinButton(selected);
+
+  const fruit = data.locations[selected];
+
+  if(fruit){
+    createPinButton(selected);
+  }
+
 }
 
-updatePrepareArea();
+// ⭐恢復已釘選格子 (避免render洗掉)
+pinnedCells.forEach(loc=>{
+
+  const cellDiv = document.getElementById(`cell-${loc}`);
+
+  if(cellDiv){
+
+    cellDiv.classList.add("pinned");
+
+    if(!cellDiv.querySelector(".pinBtn")){
+
+      const btn=document.createElement("button");
+      btn.className="pinBtn";
+      btn.textContent="❌";
+
+      btn.onclick=(e)=>{
+        e.stopPropagation();
+        unpinCell(loc);
+      };
+
+      cellDiv.appendChild(btn);
+    }
+
+  }
+
+});
 
 }
 
@@ -1776,68 +1746,6 @@ function showPinOnCell(locKey){
   pin.className = "pin";
 
   cell.appendChild(pin);
-
-}
-
-function updatePrepareArea(){
-
-  const grid = document.getElementById("prepareGrid");
-  if(!grid) return;
-
-  grid.innerHTML="";
-
-  // =========================
-  // 先顯示釘選治具
-  // =========================
-  pinnedCells.forEach(loc=>{
-
-    const d = cell(loc, loc);
-    d.classList.add("pinned");
-
-    grid.appendChild(d);
-  });
-
-  // =========================
-  // 只有釘選才顯示空位
-  // =========================
-  if(pinnedCells.size > 0){
-
-    Object.keys(data.locations).forEach(loc=>{
-
-      // 顯示空格 空位→變治具 仍保留
-      prepareCells.forEach(loc=>{
-
-  const d = cell(loc, loc);
-  grid.appendChild(d);
-
-});
-
-      // 排除機台
-      if(loc.includes("|")) return;
-
-      // 排除Z治具架
-      if(loc.startsWith("Z")) return;
-
-      const d = cell(loc, loc);
-      d.classList.add("empty");
-
-      grid.appendChild(d);
-
-    });
-
-  }
-
-}
-
-// 清空準備區
-function clearPrepareArea(){
-
-  pinnedCells.clear();
-
-  const grid = document.getElementById("prepareGrid");
-  if(grid) grid.innerHTML="";
-
-  render();
 
 }
 
