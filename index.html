@@ -11,15 +11,6 @@
 
 <style>
 
-.searchRow{
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  background: #cccccc;
-  padding: 5px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-  
 /* ===== 懸浮按鈕 ===== */
 #floatingBtn {
   position: fixed;
@@ -40,6 +31,20 @@
   box-shadow: 0 4px 10px rgba(0,0,0,.4);
   user-select: none;
 }
+
+<!-- ===== 搜尋導覽按鈕 ===== -->
+<div id="searchNav" class="hidden" style="
+  position: fixed;
+  left: 10px;
+  top: calc(50% + 70px); /* 在原按鈕下面 */
+  z-index: 99998;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+">
+  <button onclick="prevResult()">⬆</button>
+  <button onclick="nextResult()">⬇</button>
+</div>
 
 /* ===== 懸浮選單 ===== */
 .floatingMenu {
@@ -205,7 +210,7 @@ margin-top: 16px;   /* 和上方區塊間距 */
   position: relative;
 margin-top: 6px;   /* 和上方區塊間距 */
 }
-  
+
 #search { width: 458px; }
 
 .dropdown {
@@ -510,6 +515,8 @@ let isAdmin = false;
 let pendingClear = false;
 let currentUser = null;
 let lastActivity = Date.now();
+let searchResults = [];
+let currentIndex = 0;
 
 /* =====================================================
    全域資料（取代 localStorage）
@@ -897,25 +904,22 @@ function showDropdown() {
   const key = searchInput.value.trim().toLowerCase();
   dropdown.innerHTML = '';
 
-  // ⭐ 防止重複加入「無治具」
-  const list = data.fruits.includes('無治具')
-    ? data.fruits
-    : [...data.fruits, '無治具'];
-
-  const sorted = [...list].sort((a, b) =>
-    a.localeCompare(b, undefined, { sensitivity: 'base' })
-  );
+  const sorted = data.fruits
+    .slice()
+    .sort((a, b) =>
+      a.localeCompare(b, undefined, { sensitivity: 'base' })
+    );
 
   const matches = sorted.filter(f =>
     f.toLowerCase().includes(key)
   );
 
-  if (!matches.length) {
-    dropdown.classList.add('hidden');
-    arrow.textContent = "▼";
-    btnText.textContent = "點擊展開_ขยาย_Mở rộng";
-    return;
-  }
+if (!matches.length) {
+  dropdown.classList.add('hidden');
+  arrow.textContent = "▼";
+  btnText.textContent = "點擊展開_ขยาย_Mở rộng";
+  return;
+}
 
   matches.forEach(f => {
     const item = document.createElement('div');
@@ -929,8 +933,9 @@ function showDropdown() {
   });
 
   dropdown.classList.remove('hidden');
-  arrow.textContent = "▲";
-  btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
+
+arrow.textContent = "▲";
+btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
 }
 
 // ===== 懸浮按鈕拖曳 =====
@@ -1110,29 +1115,10 @@ function doSearch() {
 
   const key = document.getElementById('search').value.trim().toLowerCase();
   highlightFruits = [];
-  let hitLocs = [];
+  searchResults = [];
+  currentIndex = 0;
 
   if (!key) {
-    render();
-    return;
-  }
-
-  // ⭐⭐⭐ 特殊：搜尋「無治具」= 找空位
-  if (key === '無治具') {
-
-    const emptyLocations = Object.keys(data.locations)
-      .filter(loc => data.locations[loc] === null);
-
-    if (!emptyLocations.length) {
-      alert('ไม่มีที่ว่าง\nKhông có vị trí trống\n沒有空位');
-    } else {
-      alert('空位置：\n' + emptyLocations.join('\n'));
-    }
-
-    // ⭐ 可選：高亮空位（推薦）
-    hitLocs = emptyLocations;
-    highlightFruits = [];
-
     render();
     return;
   }
@@ -1141,7 +1127,6 @@ function doSearch() {
   const fuzzy = [];
 
   getOrderedLocations().forEach(loc => {
-
     const fruit = data.locations[loc];
     if (!fruit) return;
 
@@ -1149,37 +1134,23 @@ function doSearch() {
 
     if (f === key) exact.push({ loc, fruit });
     else if (f.includes(key)) fuzzy.push({ loc, fruit });
-
   });
 
   const hits = exact.length ? exact : fuzzy;
 
   highlightFruits = hits.map(h => h.fruit);
-  hitLocs = hits.map(h => h.loc);
+  searchResults = hits.map(h => h.loc);
 
   render();
 
-  if (hitLocs.length) {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+  if (searchResults.length) {
+    scrollToResult(0);
 
-        const el = document.getElementById(`cell-${hitLocs[0]}`);
-        if (!el) return;
-
-        const rect = el.getBoundingClientRect();
-        const y = rect.top + window.scrollY;
-
-        window.scrollTo({
-          top: y - window.innerHeight / 2 + rect.height / 2,
-          behavior: 'smooth'
-        });
-
-      });
-    });
+    // ⭐ 顯示上下按鈕
+    document.getElementById('searchNav').classList.remove('hidden');
   } else {
     alert('查無治具');
   }
-
 
   // ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
  document.getElementById('dropdown').classList.add('hidden');
@@ -1192,9 +1163,14 @@ function clearHighlight() {
   document.getElementById('search').value = '';
 // 🔽 關閉箭頭展開
   document.getElementById('dropdown').classList.add('hidden');
-resetDropdownButton();
-render();
+  resetDropdownButton();
+
+  // ⭐ 隱藏上下按鈕
+  document.getElementById('searchNav').classList.add('hidden');
+
+  render();
 }
+
 
 function resetDropdownButton() {
   const arrow = document.getElementById('arrow');
@@ -1202,6 +1178,37 @@ function resetDropdownButton() {
 
   if (arrow) arrow.textContent = "▼";
   if (btnText) btnText.textContent = "點擊展開_ขยาย_Mở rộng";
+}
+
+/* ====== 搜尋轉跳 ====== */
+function scrollToResult(index) {
+  const loc = searchResults[index];
+  const el = document.getElementById(`cell-${loc}`);
+  if (!el) return;
+
+  const rect = el.getBoundingClientRect();
+  const y = rect.top + window.scrollY;
+
+  window.scrollTo({
+    top: y - window.innerHeight / 2 + rect.height / 2,
+    behavior: 'smooth'
+  });
+}
+
+function nextResult() {
+  if (!searchResults.length) return;
+
+  currentIndex = (currentIndex + 1) % searchResults.length;
+  scrollToResult(currentIndex);
+}
+
+function prevResult() {
+  if (!searchResults.length) return;
+
+  currentIndex =
+    (currentIndex - 1 + searchResults.length) % searchResults.length;
+
+  scrollToResult(currentIndex);
 }
 
 /* ====== 新增治具 ====== */
