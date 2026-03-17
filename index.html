@@ -52,21 +52,6 @@
   margin: 6px 0;
 }
 
-
-<!-- ===== 搜尋導覽按鈕 ===== -->
-<div id="searchNav" class="hidden" style="
-  position: fixed;
-  left: 10px;
-  top: calc(50% + 70px); /* 在原按鈕下面 */
-  z-index: 100000;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-">
-  <button onclick="prevResult()">⬆</button>
-  <button onclick="nextResult()">⬇</button>
-</div>
-
 /* 📌 下拉箭頭 */
 #dropdownBtn {
   display:flex;
@@ -430,7 +415,15 @@ header {
 <div id="board"></div>
 
 <!-- ===== 懸浮按鈕22222 ===== -->
-<div id="searchNav" class="hidden">
+<div id="searchNav" class="hidden" style="
+  position: fixed;
+  left: 10px;
+  top: calc(50% + 70px);
+  z-index: 100000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+">
   <button onclick="prevResult()">⬆</button>
   <button onclick="nextResult()">⬇</button>
 </div>
@@ -1133,6 +1126,10 @@ function doSearch() {
   const exact = [];
   const fuzzy = [];
 
+
+const nav = document.getElementById('searchNav');
+if (nav) nav.classList.remove('hidden');
+
   getOrderedLocations().forEach(loc => {
     const fruit = data.locations[loc];
     if (!fruit) return;
@@ -1150,13 +1147,19 @@ function doSearch() {
 
   render();
 
-  if (searchResults.length) {
-    scrollToResult(0);
+if (searchResults.length) {
+  scrollToResult(0);
+
+  // ⭐⭐ 這行你漏掉了！！
+  const nav = document.getElementById('searchNav');
+  if (nav) nav.classList.remove('hidden');
+
+}
 
     // ⭐ 顯示上下按鈕
   document.getElementById('dropdown').classList.add('hidden');
   resetDropdownButton();
-    
+  
   } else {
     alert('查無治具');
   }
