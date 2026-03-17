@@ -1126,10 +1126,6 @@ function doSearch() {
   const exact = [];
   const fuzzy = [];
 
-
-const nav = document.getElementById('searchNav');
-if (nav) nav.classList.remove('hidden');
-
   getOrderedLocations().forEach(loc => {
     const fruit = data.locations[loc];
     if (!fruit) return;
@@ -1147,26 +1143,21 @@ if (nav) nav.classList.remove('hidden');
 
   render();
 
-if (searchResults.length) {
-  scrollToResult(0);
+  if (searchResults.length) {
+    scrollToResult(0);
 
-  // ⭐⭐ 這行你漏掉了！！
-  const nav = document.getElementById('searchNav');
-  if (nav) nav.classList.remove('hidden');
+    const nav = document.getElementById('searchNav');
+    if (nav) nav.classList.remove('hidden');
 
-}
-
-    // ⭐ 顯示上下按鈕
-  document.getElementById('dropdown').classList.add('hidden');
-  resetDropdownButton();
-  
   } else {
     alert('查無治具');
+
+    const nav = document.getElementById('searchNav');
+    if (nav) nav.classList.add('hidden');
   }
 
-  // ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
- document.getElementById('dropdown').classList.add('hidden');
-resetDropdownButton();
+  document.getElementById('dropdown').classList.add('hidden');
+  resetDropdownButton();
 }
 
 /* ====== 清除搜尋 ====== */
