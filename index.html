@@ -32,20 +32,6 @@
   user-select: none;
 }
 
-<!-- ===== 搜尋導覽按鈕 ===== -->
-<div id="searchNav" class="hidden" style="
-  position: fixed;
-  left: 10px;
-  top: calc(50% + 70px); /* 在原按鈕下面 */
-  z-index: 99998;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-">
-  <button onclick="prevResult()">⬆</button>
-  <button onclick="nextResult()">⬇</button>
-</div>
-
 /* ===== 懸浮選單 ===== */
 .floatingMenu {
   position: fixed;
@@ -65,6 +51,21 @@
   width: 160px;
   margin: 6px 0;
 }
+
+
+<!-- ===== 搜尋導覽按鈕 ===== -->
+<div id="searchNav" class="hidden" style="
+  position: fixed;
+  left: 10px;
+  top: calc(50% + 70px); /* 在原按鈕下面 */
+  z-index: 99998;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+">
+  <button onclick="prevResult()">⬆</button>
+  <button onclick="nextResult()">⬇</button>
+</div>
 
 /* 📌 下拉箭頭 */
 #dropdownBtn {
@@ -427,6 +428,12 @@ header {
   
 
 <div id="board"></div>
+
+<!-- ===== 懸浮按鈕22222 ===== -->
+<div id="searchNav" class="hidden">
+  <button onclick="prevResult()">⬆</button>
+  <button onclick="nextResult()">⬇</button>
+</div>
 
 <!-- ===== 懸浮按鈕 ===== -->
 <div id="floatingBtn">☰</div>
