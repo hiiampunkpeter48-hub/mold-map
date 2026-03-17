@@ -58,7 +58,7 @@
   position: fixed;
   left: 10px;
   top: calc(50% + 70px); /* 在原按鈕下面 */
-  z-index: 99998;
+  z-index: 100000;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -652,6 +652,11 @@ function save(){
 /* =====================================================
    核心功能區
 ===================================================== */
+
+const nav = document.getElementById('searchNav');
+if (nav) nav.classList.remove('hidden');
+
+
 // ================= 操作 =================
 function requireLogin(){
   if(isAdmin){ lastActivity=Date.now(); return true; }
