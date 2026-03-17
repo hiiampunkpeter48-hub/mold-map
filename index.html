@@ -652,11 +652,6 @@ function save(){
 /* =====================================================
    核心功能區
 ===================================================== */
-
-const nav = document.getElementById('searchNav');
-if (nav) nav.classList.remove('hidden');
-
-
 // ================= 操作 =================
 function requireLogin(){
   if(isAdmin){ lastActivity=Date.now(); return true; }
@@ -1159,7 +1154,9 @@ function doSearch() {
     scrollToResult(0);
 
     // ⭐ 顯示上下按鈕
-    document.getElementById('searchNav').classList.remove('hidden');
+  document.getElementById('dropdown').classList.add('hidden');
+  resetDropdownButton();
+}
   } else {
     alert('查無治具');
   }
