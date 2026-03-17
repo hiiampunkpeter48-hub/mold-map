@@ -897,22 +897,25 @@ function showDropdown() {
   const key = searchInput.value.trim().toLowerCase();
   dropdown.innerHTML = '';
 
-  const sorted = data.fruits
-    .slice()
-    .sort((a, b) =>
-      a.localeCompare(b, undefined, { sensitivity: 'base' })
-    );
+  // ⭐ 防止重複加入「無治具」
+  const list = data.fruits.includes('無治具')
+    ? data.fruits
+    : [...data.fruits, '無治具'];
+
+  const sorted = [...list].sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: 'base' })
+  );
 
   const matches = sorted.filter(f =>
     f.toLowerCase().includes(key)
   );
 
-if (!matches.length) {
-  dropdown.classList.add('hidden');
-  arrow.textContent = "▼";
-  btnText.textContent = "點擊展開_ขยาย_Mở rộng";
-  return;
-}
+  if (!matches.length) {
+    dropdown.classList.add('hidden');
+    arrow.textContent = "▼";
+    btnText.textContent = "點擊展開_ขยาย_Mở rộng";
+    return;
+  }
 
   matches.forEach(f => {
     const item = document.createElement('div');
@@ -926,9 +929,8 @@ if (!matches.length) {
   });
 
   dropdown.classList.remove('hidden');
-
-arrow.textContent = "▲";
-btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
+  arrow.textContent = "▲";
+  btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
 }
 
 // ===== 懸浮按鈕拖曳 =====
@@ -1115,47 +1117,70 @@ function doSearch() {
     return;
   }
 
+  // ⭐⭐⭐ 特殊：搜尋「無治具」= 找空位
+  if (key === '無治具') {
+
+    const emptyLocations = Object.keys(data.locations)
+      .filter(loc => data.locations[loc] === null);
+
+    if (!emptyLocations.length) {
+      alert('ไม่มีที่ว่าง\nKhông có vị trí trống\n沒有空位');
+    } else {
+      alert('空位置：\n' + emptyLocations.join('\n'));
+    }
+
+    // ⭐ 可選：高亮空位（推薦）
+    hitLocs = emptyLocations;
+    highlightFruits = [];
+
+    render();
+    return;
+  }
+
   const exact = [];
   const fuzzy = [];
 
-getOrderedLocations().forEach(loc => {
+  getOrderedLocations().forEach(loc => {
 
-  const fruit = data.locations[loc];
-  if (!fruit) return;
+    const fruit = data.locations[loc];
+    if (!fruit) return;
 
-  const f = fruit.toLowerCase();
+    const f = fruit.toLowerCase();
 
-  if (f === key) exact.push({ loc, fruit });
-  else if (f.includes(key)) fuzzy.push({ loc, fruit });
+    if (f === key) exact.push({ loc, fruit });
+    else if (f.includes(key)) fuzzy.push({ loc, fruit });
 
-});
+  });
 
   const hits = exact.length ? exact : fuzzy;
+
   highlightFruits = hits.map(h => h.fruit);
   hitLocs = hits.map(h => h.loc);
 
-render();
+  render();
 
-if (hitLocs.length) {
-  requestAnimationFrame(() => {
+  if (hitLocs.length) {
     requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
 
-      const el = document.getElementById(`cell-${hitLocs[0]}`);
-      if (!el) return;
+        const el = document.getElementById(`cell-${hitLocs[0]}`);
+        if (!el) return;
 
-      const rect = el.getBoundingClientRect();
-      const y = rect.top + window.scrollY;
+        const rect = el.getBoundingClientRect();
+        const y = rect.top + window.scrollY;
 
-      window.scrollTo({
-        top: y - window.innerHeight / 2 + rect.height / 2,
-        behavior: 'smooth'
+        window.scrollTo({
+          top: y - window.innerHeight / 2 + rect.height / 2,
+          behavior: 'smooth'
+        });
+
       });
-
     });
-  });
-} else {
+  } else {
     alert('查無治具');
   }
+
+
   // ⭐⭐ 統一在最後關閉下拉選單（最乾淨）
  document.getElementById('dropdown').classList.add('hidden');
 resetDropdownButton();
