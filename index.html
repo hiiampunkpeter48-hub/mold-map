@@ -1148,15 +1148,25 @@ if (searchResults.length) {
 
   // ⭐ 顯示上下按鈕
   const nav = document.getElementById('searchNav');
-  if (nav) nav.classList.remove('hidden');
+  if (searchResults.length) {
+  scrollToResult(0);
+if (nav) nav.classList.remove('hidden');
 
 } else {
   alert('查無治具');
 
   // ⭐ 隱藏上下按鈕
-  const nav = document.getElementById('searchNav');
   if (nav) nav.classList.add('hidden');
 }
+
+
+
+
+
+
+
+
+
 
   document.getElementById('dropdown').classList.add('hidden');
   resetDropdownButton();
