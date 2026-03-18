@@ -16,7 +16,22 @@
   display: none !important;
 }
 
+
+/* ===== 閃三下藍色邊框 ===== */
+@keyframes blinkBorder {
+  0%   { box-shadow: 0 0 0 0 rgba(0, 150, 255, 0); }
+  25%  { box-shadow: 0 0 0 4px rgba(0, 150, 255, 0.8); }
+  50%  { box-shadow: 0 0 0 0 rgba(0, 150, 255, 0); }
+  75%  { box-shadow: 0 0 0 4px rgba(0, 150, 255, 0.8); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 150, 255, 0); }
+}
+
+.blink {
+  animation: blinkBorder 0.6s ease-in-out 3;
+}
+
   
+
 /* ===== 懸浮按鈕 ===== */
 #floatingBtn {
   position: fixed;
@@ -1206,14 +1221,19 @@ function scrollToResult(index) {
   const el = document.getElementById(`cell-${loc}`);
   if (!el) return;
 
+  // ⭐ 滾動到畫面（方式一）
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  // ⭐ 閃爍效果
+  el.classList.remove('blink');
+  void el.offsetWidth;
+  el.classList.add('blink');
+
+  // ⭐（可選）更精準置中（方式二）
   const rect = el.getBoundingClientRect();
   const y = rect.top + window.scrollY;
-
-  window.scrollTo({
-    top: y - window.innerHeight / 2 + rect.height / 2,
-    behavior: 'smooth'
-  });
 }
+
 
 function nextResult() {
   if (!searchResults.length) return;
@@ -1230,6 +1250,9 @@ function prevResult() {
 
   scrollToResult(currentIndex);
 }
+
+
+
 
 /* ====== 新增治具 ====== */
 function addFruit() {
