@@ -540,7 +540,7 @@ let currentUser = null;
 let lastActivity = Date.now();
 let searchResults = [];
 let currentIndex = 0;
-let blinkingFruits = [];
+let currentBlinkFruit = null;
 
 /* =====================================================
    全域資料（取代 localStorage）
@@ -1164,8 +1164,7 @@ function doSearch() {
 
   highlightFruits = hits.map(h => h.fruit);
   searchResults = hits.map(h => h.loc);
-  blinkingFruits = hits.map(h => h.fruit);
-
+  
 
   render();
 
@@ -1175,6 +1174,7 @@ function doSearch() {
   const nav = document.getElementById('searchNav');
   if (searchResults.length) {
   scrollToResult(0);
+  currentBlinkFruit = data.locations[searchResults[0]];
 if (nav) nav.classList.remove('hidden');
 
 
@@ -1247,12 +1247,14 @@ function scrollToResult(index) {
   const y = rect.top + window.scrollY;
 }
 
-
+// ⭐ 轉跳上下鍵
 function nextResult() {
   if (!searchResults.length) return;
 
   currentIndex = (currentIndex + 1) % searchResults.length;
-  scrollToResult(currentIndex);
+  currentBlinkFruit = data.locations[searchResults[currentIndex]];
+
+scrollToResult(currentIndex);
 }
 
 function prevResult() {
@@ -1260,6 +1262,7 @@ function prevResult() {
 
   currentIndex =
     (currentIndex - 1 + searchResults.length) % searchResults.length;
+currentBlinkFruit = data.locations[searchResults[currentIndex]];
 
   scrollToResult(currentIndex);
 }
@@ -1453,14 +1456,17 @@ function cell(locKey, displayName) {
 
   if (!f) d.classList.add('empty');
   if (highlightFruits.includes(f)) d.classList.add('highlight');
+  
+  if (f === currentBlinkFruit) {
+  d.classList.add('blink');
+}
+  
   if (selected === locKey) d.classList.add('selected'); // ✅ 設定點擊事件
   if (locKey === newlyAddedLoc) d.classList.add('new-added');
 
   // ⭐ 新增治具紅光
   if (locKey === newlyAddedLoc) d.classList.add('new-highlight');
-  if (blinkingFruits.includes(f)) {
-  d.classList.add('blink');
-}
+
   
   d.textContent = `${displayName}: ${f || '無治具'}`;
 
