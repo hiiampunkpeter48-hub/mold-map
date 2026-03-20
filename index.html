@@ -728,6 +728,36 @@ function select(loc){
     selected = loc;
     hasMoved = true;
     pendingClear = true;
+    
+    
+    // ⭐ 重新計算搜尋結果（位置跟著治具跑）
+if (highlightFruits.length) {
+
+  searchResults = [];
+
+  getOrderedLocations().forEach(locKey => {
+    const fruit = data.locations[locKey];
+    if (highlightFruits.includes(fruit)) {
+      searchResults.push(locKey);
+    }
+  });
+
+  // ⭐ 重設 index（避免跳錯）
+  currentIndex = 0;
+}
+
+
+// ⭐ 新位置閃爍
+const el = document.getElementById(`cell-${loc}`);
+if (el) {
+  setTimeout(() => {
+    el.classList.remove('blink');
+    void el.offsetWidth;
+    el.classList.add('blink');
+  }, 50);
+}
+    
+    
     render();
   }
 }
