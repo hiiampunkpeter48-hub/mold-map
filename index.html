@@ -15,28 +15,38 @@
 
 <style>
 
-/* ⭐ 黃色整顆按鈕流動 */
-@keyframes loginGlowFull {
-  0% {
-    background: linear-gradient(90deg, #fff8cc, #ffd54f, #fff8cc);
-    background-position: 0% 50%;
-  }
-  50% {
-    background: linear-gradient(90deg, #fff8cc, #ffca28, #fff8cc);
-    background-position: 100% 50%;
-  }
-  100% {
-    background: linear-gradient(90deg, #fff8cc, #ffd54f, #fff8cc);
-    background-position: 0% 50%;
-  }
+/* ⭐ 外框發光 */
+@keyframes borderGlow {
+  0%   { box-shadow: 0 0 4px rgba(255, 200, 0, 0.3); }
+  50%  { box-shadow: 0 0 16px rgba(255, 200, 0, 1); }
+  100% { box-shadow: 0 0 4px rgba(255, 200, 0, 0.3); }
 }
 
-/* ⭐ 整顆按鈕效果 */
+/* ⭐ 按鈕背景流動 */
+@keyframes bgFlow {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* ⭐ 合體效果 */
 .login-blink {
+  /* 背景流動 */
+  background: linear-gradient(
+    90deg,
+    #fff8cc,
+    #ffd54f,
+    #fff8cc
+  );
   background-size: 200% 100%;
-  animation: loginGlowFull 1.2s linear infinite;
+  animation: 
+    bgFlow 1.2s linear infinite,
+    borderGlow 1.2s ease-in-out infinite;
+
+  /* 外框 */
+  border: 2px solid #ffcc00;
+
+  /* 文字 */
   color: #333;
-  border: 1px solid #e6b800;
 }
 
 
