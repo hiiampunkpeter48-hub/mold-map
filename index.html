@@ -1556,24 +1556,36 @@ function cell(locKey, displayName) {
   
 
 let pressTimer = null;
+let isTouch = false;
 
-// 📱 手機：長按 1 秒
-d.addEventListener('touchstart', () => {
+// 📱 手機：長按
+d.addEventListener('touchstart', (e) => {
+  isTouch = true;
+
   pressTimer = setTimeout(() => {
     select(locKey);
-  }, 1000); // ⭐ 1 秒
+  }, 1000); // 1秒（你可改1000測試）
 });
 
 d.addEventListener('touchend', () => {
   clearTimeout(pressTimer);
 });
 
-d.addEventListener('touchmove', () => {
-  clearTimeout(pressTimer); // 滑動取消
+d.addEventListener('touchcancel', () => {
+  clearTimeout(pressTimer);
 });
 
-// 🖥️ 電腦：正常點擊
-d.addEventListener('click', () => {
+d.addEventListener('touchmove', () => {
+  clearTimeout(pressTimer);
+});
+
+// 🖥️ 電腦：點擊
+d.addEventListener('click', (e) => {
+  if (isTouch) {
+    // ⭐ 防止手機觸發 click（超重要）
+    isTouch = false;
+    return;
+  }
   select(locKey);
 });
 
