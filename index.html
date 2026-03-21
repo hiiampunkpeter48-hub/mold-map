@@ -15,17 +15,28 @@
 
 <style>
 
-/* ⭐ 黃色漸變流動 */
-@keyframes loginGlow {
-  0%   { box-shadow: 0 0 5px rgba(255, 200, 0, 0.2); }
-  50%  { box-shadow: 0 0 18px rgba(255, 200, 0, 0.9); }
-  100% { box-shadow: 0 0 5px rgba(255, 200, 0, 0.2); }
+/* ⭐ 黃色整顆按鈕流動 */
+@keyframes loginGlowFull {
+  0% {
+    background: linear-gradient(90deg, #fff8cc, #ffd54f, #fff8cc);
+    background-position: 0% 50%;
+  }
+  50% {
+    background: linear-gradient(90deg, #fff8cc, #ffca28, #fff8cc);
+    background-position: 100% 50%;
+  }
+  100% {
+    background: linear-gradient(90deg, #fff8cc, #ffd54f, #fff8cc);
+    background-position: 0% 50%;
+  }
 }
 
-/* ⭐ 套用在按鈕 */
+/* ⭐ 整顆按鈕效果 */
 .login-blink {
-  animation: loginGlow 0.8s infinite;
-  border: 2px solid #ffcc00;
+  background-size: 200% 100%;
+  animation: loginGlowFull 1.2s linear infinite;
+  color: #333;
+  border: 1px solid #e6b800;
 }
 
 
