@@ -1495,7 +1495,27 @@ function cell(locKey, displayName) {
   
   d.textContent = `${displayName}: ${f || '無治具'}`;
 
-  d.onclick = () => select(locKey);
+  let pressTimer = null;
+
+// 📱 手機：長按 0.3 秒
+d.addEventListener('touchstart', () => {
+  pressTimer = setTimeout(() => {
+    select(locKey);
+  }, 300); // ⭐ 0.3 秒
+});
+
+d.addEventListener('touchend', () => {
+  clearTimeout(pressTimer);
+});
+
+d.addEventListener('touchmove', () => {
+  clearTimeout(pressTimer); // 滑動取消
+});
+
+// 🖥️ 電腦：正常點擊
+d.addEventListener('click', () => {
+  select(locKey);
+});
 
   return d;
 }
