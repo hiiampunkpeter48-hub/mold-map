@@ -241,9 +241,14 @@ margin-top: 16px;   /* 和上方區塊間距 */
 
 /* 📌 搜尋區 */
 .searchRow {
-  position: relative;
-  margin-top: 14px;   /* 和上方區塊間距 */
+  position: sticky;
+  top: 0;
+  z-index: 999;        /* 確保在最上層 */
+  background: white;   /* 避免滑動時透出下面內容 */
+  padding: 8px 0;
+margin-top: 14px;   /* 和上方區塊間距 */
 }
+
 
 .searchBox {
   position: relative;
