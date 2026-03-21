@@ -1497,11 +1497,11 @@ function cell(locKey, displayName) {
 
   let pressTimer = null;
 
-// 📱 手機：長按 0.3 秒
+// 📱 手機：長按 0.5 秒
 d.addEventListener('touchstart', () => {
   pressTimer = setTimeout(() => {
     select(locKey);
-  }, 300); // ⭐ 0.3 秒
+  }, 500); // ⭐ 0.5 秒
 });
 
 d.addEventListener('touchend', () => {
