@@ -15,6 +15,22 @@
 
 <style>
 
+/* ⭐ 黃色漸變流動 */
+@keyframes loginGlow {
+  0%   { box-shadow: 0 0 5px rgba(255, 200, 0, 0.2); }
+  50%  { box-shadow: 0 0 18px rgba(255, 200, 0, 0.9); }
+  100% { box-shadow: 0 0 5px rgba(255, 200, 0, 0.2); }
+}
+
+/* ⭐ 套用在按鈕 */
+.login-blink {
+  animation: loginGlow 0.8s infinite;
+  border: 2px solid #ffcc00;
+}
+
+
+
+
 
 .hidden {
   display: none !important;
@@ -546,8 +562,9 @@ let currentIndex = 0;
 ===================================================== */
 let data = {
 rooms: {
-  "E266":["工作桌_1","工作桌_2","工作桌_3"],
-  "E262":["工作桌_1","工作桌_2","工作桌_3"],
+  "E266":["工作桌_1","工作桌_2"],
+  "E262":["工作桌_1","工作桌_2"],
+  "E276":["工作桌_1","工作桌_2"],
   "E233":["工作桌_1","工作桌_2","工作桌_3"],
   "E202":["工作桌_1","工作桌_2","工作桌_3"],
   "E270":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
@@ -579,8 +596,12 @@ rooms: {
     "F區":["F1","F2","F3","F4","F5","F6"],
     "G區":["G1","G2","G3","G4","G5","G6"],
     "H區":["H1","H2","H3","H4","H5","H6"],
-    "W區":["W1","W2","W3","W4","W5","W6","W7","W8","W9","W10","W11","W12","W13","W14","W15","W16","W17","W18","W19","W20","W21","W22","W23","W24","W25","W26","W27","W28","W29","W30","W31","W32","W33","W34","W35","W36"],
-    "X區":["X1","X2","X3","X4","X5","X6","X7","X8","X9","X10","X11","X12","X13","X14","X15","X16","X17","X18","X19","X20","X21","X22","X23","X24","X25","X26","X27","X28","X29","X30"],
+    "J區":["J1","J2","J3","J4","J5","J6"],
+    "W區":["W1","W2","W3","W4","W5","W6","W7","W8","W9","W10","W11","W12","W13","W14","W15","W16",
+  "W17","W18","W19","W20","W21","W22","W23","W24","W25","W26","W27","W28","W29","W30","W31","W32",
+  "W33","W34","W35","W36"],
+    "X區":["X1","X2","X3","X4","X5","X6","X7","X8","X9","X10","X11","X12","X13","X14","X15","X16",
+  "X17","X18","X19","X20","X21","X22","X23","X24","X25","X26","X27","X28","X29","X30"],
     "Y區":["Y1","Y2","Y3","Y4","Y5","Y6","Y7","Y8",
   "Y9","Y10","Y11","Y12","Y13","Y14","Y15","Y16",
   "Y17","Y18","Y19","Y20","Y21","Y22","Y23","Y24",
@@ -589,7 +610,7 @@ rooms: {
   "Y41","Y42","Y43","Y44","Y45","Y46","Y47","Y48",
   "Y49","Y50","Y51","Y52","Y53","Y54","Y55","Y56",
   "Y57","Y58","Y59","Y60","Y61","Y62","Y63","Y64"],
-    "Z預留區_ที่สงวนไว้_Kín đáo":[
+    "Z預留區_ที่สงวนไว้_Kín đáo_1F or 3F":[
   "Z1","Z2","Z3","Z4","Z5","Z6","Z7","Z8",
   "Z9","Z10","Z11","Z12","Z13","Z14","Z15","Z16",
   "Z17","Z18","Z19","Z20","Z21","Z22","Z23","Z24",
@@ -864,6 +885,7 @@ function userLogin() {
   }
 
   currentUser = sel;
+updateLoginButtonEffect();
   lastActivity = Date.now();
 
   alert(`${currentUser} เข้าสู่ระบบแล้ว_Đã đăng nhập_已登入`);
@@ -887,6 +909,7 @@ function userLogout() {
   alert(`${currentUser} ออกจากระบบ_Đăng xuất_已登出`);
 
   currentUser = null;
+updateLoginButtonEffect();
 
   // 重設選單
   document.getElementById('userSelect').value = '';
@@ -1005,6 +1028,20 @@ if (!matches.length) {
 arrow.textContent = "▲";
 btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
 }
+
+
+// ===== 未登入發光 =====
+function updateLoginButtonEffect() {
+  const btn = document.getElementById('userLoginBtn');
+
+  // 未登入 → 發光
+  if (!currentUser) {
+    btn.classList.add('login-blink');
+  } else {
+    btn.classList.remove('login-blink');
+  }
+}
+
 
 // ===== 懸浮按鈕拖曳 =====
 const floatingBtn = document.getElementById('floatingBtn');
@@ -1495,13 +1532,15 @@ function cell(locKey, displayName) {
   
   d.textContent = `${displayName}: ${f || '無治具'}`;
 
-  let pressTimer = null;
+  
 
-// 📱 手機：長按 0.5 秒
+let pressTimer = null;
+
+// 📱 手機：長按 1 秒
 d.addEventListener('touchstart', () => {
   pressTimer = setTimeout(() => {
     select(locKey);
-  }, 500); // ⭐ 0.5 秒
+  }, 1000); // ⭐ 1 秒
 });
 
 d.addEventListener('touchend', () => {
@@ -1516,6 +1555,8 @@ d.addEventListener('touchmove', () => {
 d.addEventListener('click', () => {
   select(locKey);
 });
+
+
 
   return d;
 }
@@ -1678,6 +1719,10 @@ function render() {
   document.getElementById('adminPanel')
     .classList.toggle('hidden', !isAdmin);
 }
+
+
+updateLoginButtonEffect();
+
 
 // ================= 依操作交替顏色 =================
 function renderLog(){
