@@ -995,12 +995,12 @@ dropdownBtn.addEventListener('click', (e) => {
     showDropdown();
     dropdown.classList.remove('hidden');
     arrow.textContent = "▲";
-    btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
+    btnText.textContent = "點擊收合_ปิด_đóng";
   } else {
     // 收合選單
     dropdown.classList.add('hidden');
     arrow.textContent = "▼";
-    btnText.textContent = "點擊展開_ขยาย_Mở rộng";
+    btnText.textContent = "點擊展開_เปิด_mở";
   }
 });
 
@@ -1009,11 +1009,16 @@ function showDropdown() {
   const key = searchInput.value.trim().toLowerCase();
   dropdown.innerHTML = '';
 
-  const sorted = data.fruits
-    .slice()
+
+const sorted = [
+  '無治具', // ⭐ 固定第一個
+  ...data.fruits
+    .filter(f => f !== '無治具') // ⭐ 把原本的無治具全部移除
     .sort((a, b) =>
       a.localeCompare(b, undefined, { sensitivity: 'base' })
-    );
+    )
+];
+
 
   const matches = sorted.filter(f =>
     f.toLowerCase().includes(key)
@@ -1022,7 +1027,7 @@ function showDropdown() {
 if (!matches.length) {
   dropdown.classList.add('hidden');
   arrow.textContent = "▼";
-  btnText.textContent = "點擊展開_ขยาย_Mở rộng";
+  btnText.textContent = "點擊展開_เปิด_mở";
   return;
 }
 
@@ -1040,7 +1045,7 @@ if (!matches.length) {
   dropdown.classList.remove('hidden');
 
 arrow.textContent = "▲";
-btnText.textContent = "點擊收合_ของสะสม_Bộ sưu tập";
+btnText.textContent = "點擊收合_ปิด_đóng";
 }
 
 
