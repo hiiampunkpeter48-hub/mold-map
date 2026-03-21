@@ -241,14 +241,20 @@ margin-top: 16px;   /* 和上方區塊間距 */
 
 /* 📌 搜尋區 */
 .searchRow {
-  position: sticky;
-  top: 0;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
   z-index: 999;
   background: white;
-  padding: 8px 0;
+  padding: 8px 10px;
+}
+
+.searchRow button {
+  flex: 1;
 }
 
 .searchBox {
+flex: 100%;
   position: relative;
 margin-top: 6px;   /* 和上方區塊間距 */
 }
@@ -407,11 +413,24 @@ header {
   flex-wrap: wrap;
 }
 
+
+.topBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: white;
+  z-index: 1000;
+}
+
+
 /* 讓 board 不被撐爆 */
 #board {
+  margin-top: 130px; /* loginRow + searchRow 高度 */
   width: 100%;
   overflow-x: hidden;
 }
+
 </style>
 </head>
 
@@ -460,19 +479,26 @@ header {
 </div>
 
   <!-- 第二排：搜尋 -->
+<div class="topBar">
   <div class="searchRow">
     <div class="searchBox">
-  <input id="search" placeholder="治具名稱_การระบุเชื้อรา_Mã định danh khuôn" autocomplete="off" />
-<div id="dropdown" class="dropdown hidden"></div>
-  <button id="dropdownBtn" type="button">
-  <span id="arrow">▼</span>
-  <span id="btnText">點擊展開_ขยาย_Mở rộng</span>
-</button>
-<button onclick="doSearch()">🔍搜尋_ค้นหา_tìm kiếm</button>
-<button onclick="clearHighlight()">🧹清除_ชัดเจน_Thông thoáng</button></div>
-  
+      <input id="search" placeholder="治具名稱_การระบุเชื้อรา_Mã định danh khuôn" autocomplete="off" />
+
+      <div id="dropdown" class="dropdown hidden"></div>
+    </div>
+
+    <button id="dropdownBtn" type="button">
+      <span id="arrow">▼</span>
+      <span id="btnText">點擊展開_ขยาย_Mở rộng</span>
+    </button>
+
+    <button onclick="doSearch()">🔍搜尋</button>
+    <button onclick="clearHighlight()">🧹清除</button>
+  </div>
+</div>
 
 <div id="board"></div>
+
 
 <!-- ===== 懸浮按鈕22222 ===== -->
 <div id="searchNav" class="hidden" style="
