@@ -264,21 +264,15 @@ margin-top: 6px;   /* 和上方區塊間距 */
   overflow-y: auto;
 }
 
-
-
 .dropdown div {
-  display: flex;
-  justify-content: center;  /* 水平置中 */
-  align-items: center;      /* 垂直置中 */
-  padding: 8px;
+  padding: 6px 10px;
   cursor: pointer;
+  text-align: center; /* ⭐ 加這行 */
 }
 
 .dropdown div:hover {
   background: #ffd966;
 }
-
-
 
 body {
   margin: 10px;
@@ -1016,16 +1010,11 @@ function showDropdown() {
   const key = searchInput.value.trim().toLowerCase();
   dropdown.innerHTML = '';
 
-
-const sorted = [
-  '無治具', // ⭐ 固定第一個
-  ...data.fruits
-    .filter(f => f !== '無治具') // ⭐ 把原本的無治具全部移除
+  const sorted = data.fruits
+    .slice()
     .sort((a, b) =>
       a.localeCompare(b, undefined, { sensitivity: 'base' })
-    )
-];
-
+    );
 
   const matches = sorted.filter(f =>
     f.toLowerCase().includes(key)
@@ -1569,7 +1558,7 @@ d.addEventListener('touchstart', (e) => {
 
   pressTimer = setTimeout(() => {
     select(locKey);
-  }, 100); // 0.1秒（你可改1000測試）
+  }, 200); // 0.2秒（你可改1000測試）
 });
 
 d.addEventListener('touchend', () => {
