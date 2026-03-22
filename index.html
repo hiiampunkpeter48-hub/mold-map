@@ -614,7 +614,7 @@ rooms: {
     "F區":["F1","F2","F3","F4","F5","F6"],
     "G區":["G1","G2","G3","G4","G5","G6"],
     "H區":["H1","H2","H3","H4","H5","H6"],
-    "J區":["J1","J2","J3","J4","J5","J6","J7","J8"],
+    "J區":["J1","J2","J3","J4","J5","J6"],
     "W區":["W1","W2","W3","W4","W5","W6","W7","W8","W9","W10","W11","W12","W13","W14","W15","W16",
   "W17","W18","W19","W20","W21","W22","W23","W24","W25","W26","W27","W28","W29","W30","W31","W32",
   "W33","W34","W35","W36"],
@@ -652,68 +652,19 @@ if (!Array.isArray(data.roomOrder) || !data.roomOrder.length) data.roomOrder = O
 if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Object.keys(data.boxes);
 
 /* =====================================================
-   更新新增，從雲端實時載入
+   從雲端實時載入
 ===================================================== */
 
-let isSyncing = false;
-
 database.ref("systemData").on("value", function(snapshot){
-
-  if(!snapshot.exists()){
-    save();
-    return;
-  }
-
-  if(isSyncing) return;
-
-  let cloud = snapshot.val();
-
-  if(!cloud.rooms) cloud.rooms = {};
-  if(!cloud.boxes) cloud.boxes = {};
-
-  let changed = false;
-
-  // rooms
-  for(let key in data.rooms){
-    if(!cloud.rooms[key]){
-      cloud.rooms[key] = data.rooms[key];
-      changed = true;
+if(!snapshot.val()) return;
+    if(snapshot.exists()){
+        data = snapshot.val();
+        safeInit();
+        render();        
+    } else {
+        // 第一次初始化
+        save(); 
     }
-  }
-
-  // boxes
-  for(let key in data.boxes){
-    if(!cloud.boxes[key]){
-      cloud.boxes[key] = data.boxes[key];
-      changed = true;
-    }
-  }
-
-  // ⭐ 補 roomOrder
-  if(!Array.isArray(cloud.roomOrder) || !cloud.roomOrder.length){
-    cloud.roomOrder = Object.keys(cloud.rooms);
-    changed = true;
-  }
-
-  // ⭐ 補 boxOrder
-  if(!Array.isArray(cloud.boxOrder) || !cloud.boxOrder.length){
-    cloud.boxOrder = Object.keys(cloud.boxes);
-    changed = true;
-  }
-
-  data = cloud;
-
-  safeInit();
-  render();
-
-  if(changed){
-    isSyncing = true;
-    database.ref("systemData").set(data).then(()=>{
-      isSyncing = false;
-      console.log("已補齊所有資料（含 order）");
-    });
-  }
-
 });
 
 
@@ -1601,39 +1552,7 @@ function cell(locKey, displayName) {
 
   
 
-let pressTimer = null;
-let isTouch = false;
-
-// 📱 手機：長按
-d.addEventListener('touchstart', (e) => {
-  isTouch = true;
-
-  pressTimer = setTimeout(() => {
-    select(locKey);
-  }, 300); // 0.3秒
-});
-
-d.addEventListener('touchend', () => {
-  clearTimeout(pressTimer);
-});
-
-d.addEventListener('touchcancel', () => {
-  clearTimeout(pressTimer);
-});
-
-d.addEventListener('touchmove', () => {
-  clearTimeout(pressTimer);
-});
-
-// 🖥️ 電腦：點擊
-d.addEventListener('click', (e) => {
-  if (isTouch) {
-    // ⭐ 防止手機觸發 click（超重要）
-    isTouch = false;
-    return;
-  }
-  select(locKey);
-});
+d.onclick = () => select(locKey);
 
 
 
