@@ -499,6 +499,8 @@ header {
     <button onclick="adminLogin()" id="adminBtn">管理員登入</button>
     <button onclick="adminLogout()" id="logoutBtn" class="adminOnly">管理員登出</button>
   
+  <button onclick="safeme()">安全初始化</button>
+  
  <div class="admin hidden" id="adminPanel">
     <button onclick="addFruit()" class="adminOnly">新增治具</button>
     <button onclick="removeFruit()" class="adminOnly">刪除治具</button>
@@ -522,6 +524,56 @@ window.onerror = function(msg, url, line, col, error){
     "col: " + col
   );
 };
+
+
+  // snippet 內容
+function safeme() {
+// =====直接貼進 Console 執行即可============ 完整安全初始化（只補新 key，不動舊資料） =================
+
+// 確保 locations 存在
+if (!data.locations) data.locations = {};
+
+// 1️⃣ 補齊機台 table（含新增加的預留機台 / table）
+for (const room in data.rooms) {
+  data.rooms[room].forEach(t => {
+    const key = `${room}|${t}`;
+    if (!(key in data.locations)) {
+      data.locations[key] = null;   // 只補新的，不動舊資料
+    }
+  });
+}
+
+// 2️⃣ 補齊治具架（含 W/X/Y/Z 新增格位）
+Object.values(data.boxes).flat().forEach(b => {
+  if (!(b in data.locations)) {
+    data.locations[b] = null;       // 只補新的
+  }
+});
+
+// 3️⃣ 清除孤兒 key（建議，可選）
+for (const loc in {...data.locations}) { // 用展開符號避免迭代中刪除影響
+  const isTable = loc.includes('|');
+  if (isTable) {
+    const [r, t] = loc.split('|');
+    if (!data.rooms[r] || !data.rooms[r].includes(t)) {
+      delete data.locations[loc];
+    }
+  } else {
+    if (!Object.values(data.boxes).flat().includes(loc)) {
+      delete data.locations[loc];
+    }
+  }
+}
+
+// 4️⃣ 儲存
+save();
+
+// 5️⃣ 重新渲染畫面
+render();
+
+console.log('✅ 安全初始化完成，舊的 fruits 與 log 已保留，新 table/box 已補齊');
+}
+
 
 
 /* =====================================================
@@ -1550,11 +1602,8 @@ function cell(locKey, displayName) {
   
   d.textContent = `${displayName}: ${f || '無治具'}`;
 
-  
-
+ 
 d.onclick = () => select(locKey);
-
-
 
   return d;
 }
