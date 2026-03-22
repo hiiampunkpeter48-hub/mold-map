@@ -655,35 +655,53 @@ if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Obje
    更新新增，從雲端實時載入
 ===================================================== */
 
+let isSyncing = false;
+
 database.ref("systemData").on("value", function(snapshot){
-  if(!snapshot.val()) return;
 
-  if(snapshot.exists()){
-      let cloud = snapshot.val();
-
-      // ✅ 補 rooms（本地有但雲端沒有的）
-      for(let key in data.rooms){
-        if(!cloud.rooms[key]){
-          cloud.rooms[key] = data.rooms[key];
-        }
-      }
-
-      // ✅ 補 boxes
-      for(let key in data.boxes){
-        if(!cloud.boxes[key]){
-          cloud.boxes[key] = data.boxes[key];
-        }
-      }
-
-      data = cloud;
-
-      save(); // ⭐ 把補齊後的寫回雲端
-
-      safeInit();
-      render();        
-  } else {
-      save(); 
+  if(!snapshot.exists()){
+    save();
+    return;
   }
+
+  if(isSyncing) return;
+
+  let cloud = snapshot.val();
+
+  if(!cloud.rooms) cloud.rooms = {};
+  if(!cloud.boxes) cloud.boxes = {};
+
+  let changed = false;
+
+  // rooms
+  for(let key in data.rooms){
+    if(!cloud.rooms[key]){
+      cloud.rooms[key] = data.rooms[key];
+      changed = true;
+    }
+  }
+
+  // boxes
+  for(let key in data.boxes){
+    if(!cloud.boxes[key]){
+      cloud.boxes[key] = data.boxes[key];
+      changed = true;
+    }
+  }
+
+  data = cloud;
+
+  safeInit();
+  render();
+
+  if(changed){
+    isSyncing = true;
+    database.ref("systemData").set(data).then(()=>{
+      isSyncing = false;
+      console.log("已同步新資料到雲端");
+    });
+  }
+
 });
 
 
