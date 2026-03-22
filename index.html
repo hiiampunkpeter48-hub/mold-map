@@ -689,6 +689,18 @@ database.ref("systemData").on("value", function(snapshot){
     }
   }
 
+  // ⭐ 補 roomOrder
+  if(!Array.isArray(cloud.roomOrder) || !cloud.roomOrder.length){
+    cloud.roomOrder = Object.keys(cloud.rooms);
+    changed = true;
+  }
+
+  // ⭐ 補 boxOrder
+  if(!Array.isArray(cloud.boxOrder) || !cloud.boxOrder.length){
+    cloud.boxOrder = Object.keys(cloud.boxes);
+    changed = true;
+  }
+
   data = cloud;
 
   safeInit();
@@ -698,7 +710,7 @@ database.ref("systemData").on("value", function(snapshot){
     isSyncing = true;
     database.ref("systemData").set(data).then(()=>{
       isSyncing = false;
-      console.log("已同步新資料到雲端");
+      console.log("已補齊所有資料（含 order）");
     });
   }
 
