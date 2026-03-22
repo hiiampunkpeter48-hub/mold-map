@@ -614,7 +614,7 @@ rooms: {
     "F區":["F1","F2","F3","F4","F5","F6"],
     "G區":["G1","G2","G3","G4","G5","G6"],
     "H區":["H1","H2","H3","H4","H5","H6"],
-    "J區":["J1","J2","J3","J4","J5","J6"],
+    "J區":["J1","J2","J3","J4","J5","J6","J7","J8"],
     "W區":["W1","W2","W3","W4","W5","W6","W7","W8","W9","W10","W11","W12","W13","W14","W15","W16",
   "W17","W18","W19","W20","W21","W22","W23","W24","W25","W26","W27","W28","W29","W30","W31","W32",
   "W33","W34","W35","W36"],
@@ -652,19 +652,38 @@ if (!Array.isArray(data.roomOrder) || !data.roomOrder.length) data.roomOrder = O
 if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Object.keys(data.boxes);
 
 /* =====================================================
-   從雲端實時載入
+   更新新增，從雲端實時載入
 ===================================================== */
 
 database.ref("systemData").on("value", function(snapshot){
-if(!snapshot.val()) return;
-    if(snapshot.exists()){
-        data = snapshot.val();
-        safeInit();
-        render();        
-    } else {
-        // 第一次初始化
-        save(); 
-    }
+  if(!snapshot.val()) return;
+
+  if(snapshot.exists()){
+      let cloud = snapshot.val();
+
+      // ✅ 補 rooms（本地有但雲端沒有的）
+      for(let key in data.rooms){
+        if(!cloud.rooms[key]){
+          cloud.rooms[key] = data.rooms[key];
+        }
+      }
+
+      // ✅ 補 boxes
+      for(let key in data.boxes){
+        if(!cloud.boxes[key]){
+          cloud.boxes[key] = data.boxes[key];
+        }
+      }
+
+      data = cloud;
+
+      save(); // ⭐ 把補齊後的寫回雲端
+
+      safeInit();
+      render();        
+  } else {
+      save(); 
+  }
 });
 
 
