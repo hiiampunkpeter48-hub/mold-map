@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="icon.png">
 
 
-<!-- Firebase v8 CDN（不用 Node） -->
+<!-- Firebase v8 CDN（不用 Node）🛠️ -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -126,6 +126,10 @@
   box-shadow: 0 4px 10px rgba(0,0,0,.4);
 }
 
+#adminFloatingBtn {
+  display: none; /* 預設隱藏 */
+}
+
 
 
 /* 📌 下拉箭頭 */
@@ -144,18 +148,6 @@
   transition: transform 0.25s;
 }
 
-/* 📌 管理員控制列 (固定底部) */
-.adminBar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid #ccc;
-
-  z-index: 60; /* 高於背景、空位、外框，但低於互動提示 */
-  padding: 6px 10px;
-}
 
 /* 📌 有治具格子顏色 */
 .cell.hasFruit {
@@ -190,7 +182,7 @@
 .boxes.F區 h3 { background-color: #FFFF00; } /* F：黃 */
 .boxes.G區 h3 { background-color: #00B050; } /* G：深綠 */
 .boxes.H區 h3 { background-color: #920000; } /* H：深紅 */
-.boxes.J區 h3 { background-color: #00B0F0; } /* J：藍 */
+.boxes.J區 h3 { background-color: #0000FF; } /* J：藍 */
 .boxes.W區 h3 { background-color: #ce93d8; } /* W：淺紫 */
 .boxes.X區 h3 { background-color: #90caf9; } /* X：淺藍 */
 .boxes.Y區 h3 { background-color: #ff6b6b; } /* Y：淺紅 */
@@ -522,7 +514,7 @@ header {
 
 
 <!-- ===== 管理員工具按鈕（左下） ===== -->
-<div id="adminFloatingBtn">🔧</div>
+<div id="adminFloatingBtn">🛠️</div>
 
 <div id="adminMenu" class="floatingMenu hidden">
   <button onclick="addFruit()">新增治具</button>
@@ -534,12 +526,10 @@ header {
 </div>
 
 
-
-<button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
-
-
 <!-- 搬移記錄放這裡翻譯不要動 log -->
 <div class="log" id="log" translate="no"></div>
+
+<button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
 
 <script>
 
@@ -562,7 +552,7 @@ function safeme(){
   safeInit();
   save();
   render();
-  console.log("🔧 結構已強制同步");
+  console.log("🛠️ 結構已強制同步");
 }
 
 
@@ -1307,18 +1297,22 @@ const ADMIN_HASH = 'MDQyNA==';
 
 function toggleAdmin(){
 
-  // ===== 已登入 → 執行登出 =====
+  // ===== 已登入 → 登出 =====
   if(isAdmin){
     isAdmin = false;
 
     alert('已登出管理員');
 
-    updateAdminButton(); // ⭐ 更新按鈕文字
+    // ⭐ 隱藏懸浮工具
+    document.getElementById('adminFloatingBtn').style.display = 'none';
+    document.getElementById('adminMenu').classList.add('hidden');
+
+    updateAdminButton();
     render();
     return;
   }
 
-  // ===== 未登入 → 執行登入 =====
+  // ===== 未登入 → 登入 =====
   const p = prompt('輸入管理員密碼');
   if(!p) return;
 
@@ -1328,8 +1322,12 @@ function toggleAdmin(){
 
     alert('管理員登入成功');
 
-    updateAdminButton(); // ⭐ 更新按鈕文字
+    // ⭐⭐ 這行是關鍵 ⭐⭐
+    document.getElementById('adminFloatingBtn').style.display = 'flex';
+
+    updateAdminButton();
     render();
+
   }else{
     alert('密碼錯誤');
   }
