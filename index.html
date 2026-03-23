@@ -770,16 +770,26 @@ function save(){
 
 
 // ☰ 打開時關掉 🔧
-floatingBtn.addEventListener('click', () => {
-  floatingMenu.classList.toggle('hidden');
-  adminMenu.classList.add('hidden'); // ⭐
-});
+window.addEventListener('DOMContentLoaded', () => {
 
-// 🔧 打開時關掉 ☰
-adminBtn.addEventListener('click', () => {
-  if (isDraggingAdmin) return;
-  adminMenu.classList.toggle('hidden');
-  floatingMenu.classList.add('hidden'); // ⭐
+  const floatingBtn = document.getElementById('floatingBtn');
+  const floatingMenu = document.getElementById('floatingMenu');
+  const adminBtn = document.getElementById('adminFloatingBtn');
+  const adminMenu = document.getElementById('adminMenu');
+
+  floatingBtn.addEventListener('click', () => {
+    floatingMenu.classList.toggle('hidden');
+    if (adminMenu) adminMenu.classList.add('hidden');
+  });
+
+  if (adminBtn) {
+    adminBtn.addEventListener('click', () => {
+      if (isDraggingAdmin) return;
+      adminMenu.classList.toggle('hidden');
+      if (floatingMenu) floatingMenu.classList.add('hidden');
+    });
+  }
+
 });
 
 
