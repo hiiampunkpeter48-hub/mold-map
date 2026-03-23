@@ -1671,31 +1671,49 @@ function editNames(){
   }
 }
 
-/* ====== 結構同步器 ====== */
 function safeInit(){
 
-  // ========= 基本欄位保護 =========
+  // ========= 基本欄位保護（一定要最前面）=========
   if(!data.rooms) data.rooms = {};
   if(!data.boxes) data.boxes = {};
   if(!data.fruits) data.fruits = [];
   if(!data.locations) data.locations = {};
   if(!data.log) data.log = [];
-  if(!data.roomOrder) data.roomOrder = Object.keys(data.rooms);
-  if(!data.boxOrder) data.boxOrder = Object.keys(data.boxes);
+  if(!data.roomOrder) data.roomOrder = [];
+  if(!data.boxOrder) data.boxOrder = [];
 
-// ========= 補齊所有 Room Table =========
-data.roomOrder.forEach(room => {
+// 清掉不存在的 room
+data.roomOrder = data.roomOrder.filter(r => data.rooms[r]);
 
-  if (!data.rooms[room]) return;
+// 清掉不存在的 box
+data.boxOrder = data.boxOrder.filter(b => data.boxes[b]);
 
-  data.rooms[room].forEach(table => {
-    const key = `${room}|${table}`;
-    if (!(key in data.locations)) {
-      data.locations[key] = null;
+  // ========= 同步 order（補新，不刪舊）=========
+  Object.keys(data.rooms).forEach(r=>{
+    if(!data.roomOrder.includes(r)){
+      data.roomOrder.push(r);
     }
   });
 
-});
+  Object.keys(data.boxes).forEach(b=>{
+    if(!data.boxOrder.includes(b)){
+      data.boxOrder.push(b);
+    }
+  });
+
+  // ========= 補齊所有 Room Table =========
+  data.roomOrder.forEach(room => {
+
+    if (!data.rooms[room]) return;
+
+    data.rooms[room].forEach(table => {
+      const key = `${room}|${table}`;
+      if (!(key in data.locations)) {
+        data.locations[key] = null;
+      }
+    });
+
+  });
 
   // ========= 補齊所有 Box 小框 =========
   Object.values(data.boxes).flat().forEach(boxCell=>{
@@ -1721,7 +1739,6 @@ data.roomOrder.forEach(room => {
       }
     }
   }
-
 }
 
 // ================= 渲染 =================
