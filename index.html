@@ -105,6 +105,29 @@
   margin: 6px 0;
 }
 
+
+
+/* ===== 管理員懸浮按鈕 ===== */
+#adminFloatingBtn {
+  position: fixed;
+  left: 10px;
+  bottom: 20px;
+  z-index: 100000;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  background: #607d8b;
+  color: white;
+  font-size: 24px;
+  display: none; /* ⭐ 預設隱藏 */
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  box-shadow: 0 4px 10px rgba(0,0,0,.4);
+}
+
+
+
 /* 📌 下拉箭頭 */
 #dropdownBtn {
   display:flex;
@@ -496,21 +519,24 @@ header {
   <button onclick="scrollBottomPage()">⬇ ด้านล่าง_đáy_畫面移至底部</button>
 </div>
 
-<div class="adminBar">
-    <button onclick="adminLogin()" id="adminBtn">管理員登入</button>
-    <button onclick="adminLogout()" id="logoutBtn" class="adminOnly">管理員登出</button>
-  
 
-  
- <div class="admin hidden" id="adminPanel">
-    <button onclick="addFruit()" class="adminOnly">新增治具</button>
-    <button onclick="removeFruit()" class="adminOnly">刪除治具</button>
-    <button onclick="editNames()">編輯機台 / 工作桌 / 治具架名稱</button>
-<button onclick="exportBackup()">匯出 layout + log</button>
-<button onclick="importBackup()">匯入 layout + log</button>
+
+<!-- ===== 管理員工具按鈕（左下） ===== -->
+<div id="adminFloatingBtn">🔧</div>
+
+<div id="adminMenu" class="floatingMenu hidden">
+  <button onclick="addFruit()">新增治具</button>
+  <button onclick="removeFruit()">刪除治具</button>
+  <button onclick="editNames()">編輯名稱</button>
+  <button onclick="exportBackup()">匯出</button>
+  <button onclick="importBackup()">匯入</button>
   <button onclick="safeme()">安全初始化</button>
 </div>
-</div>
+
+
+
+<button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
+
 
 <!-- 搬移記錄放這裡翻譯不要動 log -->
 <div class="log" id="log" translate="no"></div>
@@ -960,12 +986,20 @@ updateLoginButtonEffect();
   render();
 }
 
-function adminLogout() {
-  isAdmin = false;
-  document.getElementById('adminBtn').textContent = '管理員登入';
-  alert('已登出管理員');
-  render();
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 document.getElementById('search').addEventListener('keydown', function (e) {
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -1203,23 +1237,119 @@ function openBoxSelector(){
   createSelector("選取 治具區", data.boxOrder, "治具架 ");
 }
 
+
+
+
+
+const adminBtn = document.getElementById('adminFloatingBtn');
+const adminMenu = document.getElementById('adminMenu');
+
+let isDraggingAdmin = false;
+let offsetAX, offsetAY;
+
+// 滑鼠
+adminBtn.addEventListener('mousedown', e => {
+  isDraggingAdmin = true;
+  offsetAX = e.clientX - adminBtn.offsetLeft;
+  offsetAY = e.clientY - adminBtn.offsetTop;
+});
+
+document.addEventListener('mousemove', e => {
+  if (!isDraggingAdmin) return;
+  adminBtn.style.left = (e.clientX - offsetAX) + 'px';
+  adminBtn.style.top = (e.clientY - offsetAY) + 'px';
+  adminBtn.style.bottom = 'auto';
+});
+
+document.addEventListener('mouseup', () => {
+  isDraggingAdmin = false;
+});
+
+// 手機
+adminBtn.addEventListener('touchstart', e => {
+  isDraggingAdmin = true;
+  const t = e.touches[0];
+  offsetAX = t.clientX - adminBtn.offsetLeft;
+  offsetAY = t.clientY - adminBtn.offsetTop;
+});
+
+document.addEventListener('touchmove', e => {
+  if (!isDraggingAdmin) return;
+  const t = e.touches[0];
+  adminBtn.style.left = (t.clientX - offsetAX) + 'px';
+  adminBtn.style.top = (t.clientY - offsetAY) + 'px';
+  adminBtn.style.bottom = 'auto';
+});
+
+document.addEventListener('touchend', () => {
+  isDraggingAdmin = false;
+});
+
+// 點擊開關
+adminBtn.addEventListener('click', () => {
+  if (isDraggingAdmin) return;
+  adminMenu.classList.toggle('hidden');
+});
+
+
+
+
+
+
+
+
+
+
 /* Console=btoa('abc789') */
 /* ====== 管理員登入 ===== */
 const ADMIN_HASH = 'MDQyNA=='; 
 
-function adminLogin() {
-  const p = prompt('輸入管理員密碼');
-  if (!p) return;
 
-  if (btoa(p) === ADMIN_HASH) {
+function toggleAdmin(){
+
+  // ===== 已登入 → 執行登出 =====
+  if(isAdmin){
+    isAdmin = false;
+
+    alert('已登出管理員');
+
+    updateAdminButton(); // ⭐ 更新按鈕文字
+    render();
+    return;
+  }
+
+  // ===== 未登入 → 執行登入 =====
+  const p = prompt('輸入管理員密碼');
+  if(!p) return;
+
+  if(btoa(p) === ADMIN_HASH){
     isAdmin = true;
     lastActivity = Date.now();
-    document.getElementById('adminBtn').textContent = '管理員已登入';
+
+    alert('管理員登入成功');
+
+    updateAdminButton(); // ⭐ 更新按鈕文字
     render();
-  } else {
+  }else{
     alert('密碼錯誤');
   }
 }
+
+
+
+function updateAdminButton(){
+  const btn = document.getElementById('adminToggleBtn');
+
+  if(isAdmin){
+    btn.textContent = '🔓管理員登出';
+  }else{
+    btn.textContent = '🔒管理員登入';
+  }
+}
+
+
+
+
 
 
 // ===== 畫面順序的 location list =====
@@ -1762,15 +1892,13 @@ function render() {
     // ✅ 改成這行
   renderLog();
 
-  document.querySelectorAll('.adminOnly')
-    .forEach(b=>b.style.display=isAdmin?'':'none');
-
-  document.getElementById('adminPanel')
-    .classList.toggle('hidden', !isAdmin);
 }
 
 
 updateLoginButtonEffect();
+updateAdminButton();
+
+
 
 
 // ================= 依操作交替顏色 =================
