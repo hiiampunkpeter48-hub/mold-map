@@ -767,32 +767,6 @@ function save(){
 /* =====================================================
    核心功能區
 ===================================================== */
-
-
-// ☰ 打開時關掉 🔧
-window.addEventListener('DOMContentLoaded', () => {
-
-  const floatingBtn = document.getElementById('floatingBtn');
-  const floatingMenu = document.getElementById('floatingMenu');
-  const adminBtn = document.getElementById('adminFloatingBtn');
-  const adminMenu = document.getElementById('adminMenu');
-
-  floatingBtn.addEventListener('click', () => {
-    floatingMenu.classList.toggle('hidden');
-    if (adminMenu) adminMenu.classList.add('hidden');
-  });
-
-  if (adminBtn) {
-    adminBtn.addEventListener('click', () => {
-      if (isDraggingAdmin) return;
-      adminMenu.classList.toggle('hidden');
-      if (floatingMenu) floatingMenu.classList.add('hidden');
-    });
-  }
-
-});
-
-
 // ================= 操作 =================
 function requireLogin(){
   if(isAdmin){ lastActivity=Date.now(); return true; }
