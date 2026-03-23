@@ -528,53 +528,15 @@ window.onerror = function(msg, url, line, col, error){
 };
 
 
-  // snippet 內容
-function safeme() {
+// snippet 內容
 // =====直接貼進 Console 執行即可============ 完整安全初始化（只補新 key，不動舊資料） =================
 
-// 確保 locations 存在
-if (!data.locations) data.locations = {};
-
-// 1️⃣ 補齊機台 table（含新增加的預留機台 / table）
-for (const room in data.rooms) {
-  data.rooms[room].forEach(t => {
-    const key = `${room}|${t}`;
-    if (!(key in data.locations)) {
-      data.locations[key] = null;   // 只補新的，不動舊資料
-    }
-  });
-}
-
-// 2️⃣ 補齊治具架（含 W/X/Y/Z 新增格位）
-Object.values(data.boxes).flat().forEach(b => {
-  if (!(b in data.locations)) {
-    data.locations[b] = null;       // 只補新的
-  }
-});
-
-// 3️⃣ 清除孤兒 key（建議，可選）
-for (const loc in {...data.locations}) { // 用展開符號避免迭代中刪除影響
-  const isTable = loc.includes('|');
-  if (isTable) {
-    const [r, t] = loc.split('|');
-    if (!data.rooms[r] || !data.rooms[r].includes(t)) {
-      delete data.locations[loc];
-    }
-  } else {
-    if (!Object.values(data.boxes).flat().includes(loc)) {
-      delete data.locations[loc];
-    }
-  }
-}
-
-// 4️⃣ 儲存
-save();
-
-// 5️⃣ 重新渲染畫面
-render();
-
-console.log('✅ 安全初始化完成，舊的 fruits 與 log 已保留，新 table/box 已補齊');
-alert("已檢查並同步資料結構（若有缺少已自動補齊）");
+// 管理員工具（維修用）
+function safeme(){
+  safeInit();
+  save();
+  render();
+  console.log("🔧 結構已強制同步");
 }
 
 
@@ -1671,9 +1633,11 @@ function editNames(){
   }
 }
 
+
+
 function safeInit(){
 
-  // ========= 基本欄位保護（一定要最前面）=========
+  // ========= 基本欄位保護 =========
   if(!data.rooms) data.rooms = {};
   if(!data.boxes) data.boxes = {};
   if(!data.fruits) data.fruits = [];
@@ -1682,28 +1646,46 @@ function safeInit(){
   if(!data.roomOrder) data.roomOrder = [];
   if(!data.boxOrder) data.boxOrder = [];
 
-// 清掉不存在的 room
-data.roomOrder = data.roomOrder.filter(r => data.rooms[r]);
+  // ========= 清理不存在的 =========
+  data.roomOrder = data.roomOrder.filter(r => data.rooms[r]);
+  data.boxOrder = data.boxOrder.filter(b => data.boxes[b]);
 
-// 清掉不存在的 box
-data.boxOrder = data.boxOrder.filter(b => data.boxes[b]);
+  // ========= ⭐ 固定順序（你自己定義） =========
+  const DEFAULT_ROOM_ORDER = [
+    "E266","E262","E276","E233","E202","E270","E269","E232","E225","E238","E243","E231","E225之1","E272","E234",
+    "E259","E237","E273","E248","E250","E260","E249","E251"
+    // ...照你HTML順序
+  ];
 
-  // ========= 同步 order（補新，不刪舊）=========
-  Object.keys(data.rooms).forEach(r=>{
-    if(!data.roomOrder.includes(r)){
-      data.roomOrder.push(r);
+  const DEFAULT_BOX_ORDER = [
+    "A區","B區","C區","D區","E區","F區",
+    "G區","H區","J區","W區","X區","Y區","Z預留區_ที่สงวนไว้_Kín đáo_1F or 3F"
+  ];
+
+  // ========= ⭐ rooms 排序 =========
+  let newRoomOrder = DEFAULT_ROOM_ORDER.filter(r => data.rooms[r]);
+
+  Object.keys(data.rooms).forEach(r => {
+    if (!newRoomOrder.includes(r)) {
+      newRoomOrder.push(r);
     }
   });
 
-  Object.keys(data.boxes).forEach(b=>{
-    if(!data.boxOrder.includes(b)){
-      data.boxOrder.push(b);
+  data.roomOrder = newRoomOrder;
+
+  // ========= ⭐ boxes 排序 =========
+  let newBoxOrder = DEFAULT_BOX_ORDER.filter(b => data.boxes[b]);
+
+  Object.keys(data.boxes).forEach(b => {
+    if (!newBoxOrder.includes(b)) {
+      newBoxOrder.push(b);
     }
   });
 
-  // ========= 補齊所有 Room Table =========
+  data.boxOrder = newBoxOrder;
+
+  // ========= 補齊 Room Table =========
   data.roomOrder.forEach(room => {
-
     if (!data.rooms[room]) return;
 
     data.rooms[room].forEach(table => {
@@ -1712,17 +1694,16 @@ data.boxOrder = data.boxOrder.filter(b => data.boxes[b]);
         data.locations[key] = null;
       }
     });
-
   });
 
-  // ========= 補齊所有 Box 小框 =========
+  // ========= 補齊 Box 小框 =========
   Object.values(data.boxes).flat().forEach(boxCell=>{
     if(!(boxCell in data.locations)){
       data.locations[boxCell] = null;
     }
   });
 
-  // ========= 清理孤兒 key =========
+  // ========= 清理孤兒 =========
   for(const loc in data.locations){
 
     const isTable = loc.includes('|');
@@ -1740,6 +1721,7 @@ data.boxOrder = data.boxOrder.filter(b => data.boxes[b]);
     }
   }
 }
+
 
 // ================= 渲染 =================
 function render() {
