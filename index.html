@@ -112,6 +112,11 @@
   width: 160px;
   margin: 6px 0;
 }
+#adminMenu button {
+  width: auto;
+  min-width: 120px;
+  white-space: nowrap;
+}
 
 
 
@@ -762,6 +767,22 @@ function save(){
 /* =====================================================
    核心功能區
 ===================================================== */
+
+
+// ☰ 打開時關掉 🔧
+floatingBtn.addEventListener('click', () => {
+  floatingMenu.classList.toggle('hidden');
+  adminMenu.classList.add('hidden'); // ⭐
+});
+
+// 🔧 打開時關掉 ☰
+adminBtn.addEventListener('click', () => {
+  if (isDraggingAdmin) return;
+  adminMenu.classList.toggle('hidden');
+  floatingMenu.classList.add('hidden'); // ⭐
+});
+
+
 // ================= 操作 =================
 function requireLogin(){
   if(isAdmin){ lastActivity=Date.now(); return true; }
