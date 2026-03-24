@@ -341,7 +341,7 @@ input, button, select { padding: 8px; font-size: 16px; }
 /* 📌 搬移記錄視窗 */
 .log {
   background: #111;
-  padding: 10px;
+  padding: 1px;
   height: 480px;
   width: 680px;
   overflow: auto;
@@ -526,10 +526,22 @@ header {
 <div id="floatingBtn">☰</div>
 
 <div id="floatingMenu" class="floatingMenu hidden">
-  <button onclick="scrollTopPage()">⬆ สูงสุด_đứng đầu_畫面移至頂端</button>
-  <button onclick="openRoomSelector()">🏭 เครื่องจักร_máy móc_選取機台</button>
-  <button onclick="openBoxSelector()">📦 พื้นที่_khu vực_選取治具區</button>
-  <button onclick="scrollBottomPage()">⬇ ด้านล่าง_đáy_畫面移至底部</button>
+<button onclick="scrollTopPage()">
+  ⬆ สูงสุด / đứng đầu<br>
+  <small>畫面移至頂端</small>
+</button>
+  <button onclick="openRoomSelector()">
+  🏭 เครื่องจักร_máy móc<br>
+選取機台</small>
+</button>
+  <button onclick="openBoxSelector()">
+  📦 พื้นที่_khu vực<br>
+  <small>選取治具區</small>
+</button>
+  <button onclick="scrollBottomPage()">
+⬇ ด้านล่าง_đáy<br>
+  <small>畫面移至底部</small>
+</button>
 </div>
 
 
