@@ -551,8 +551,9 @@ header {
 <!-- 搬移記錄放這裡翻譯不要動 log -->
 <div class="log" id="log" translate="no"></div>
 
+<button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
+    
 <script>
-
 
 window.onerror = function(msg, url, line, col, error){
   alert(
@@ -2004,7 +2005,6 @@ function renderLog(){
   // logDiv.scrollTop = logDiv.scrollHeight;
 }
 
-<button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
 </script>
 </body>
 </html>
