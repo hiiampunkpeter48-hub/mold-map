@@ -532,7 +532,7 @@ header {
 </button>
   <button onclick="openRoomSelector()">
   🏭 เครื่องจักร_máy móc<br>
-選取機台</small>
+  <small>選取機台</small>
 </button>
   <button onclick="openBoxSelector()">
   📦 พื้นที่_khu vực<br>
@@ -596,17 +596,29 @@ function safeme(){
 
 // 一開始就檢查網路狀態
 if (!navigator.onLine) {
-    alert("裝置未連線，部分功能可能無法使用");
+    alert(
+      "โปรดตรวจสอบเครือข่ายของคุณ\n" +
+      "Vui lòng kiểm tra mạng của bạn.\n" +
+      "裝置未連線，請檢查網路"
+    );
 }
 
 // 當網路斷開時
 window.addEventListener("offline", function() {
-    alert("網路中斷，部分功能可能無法使用");
+    alert(
+      "โปรดตรวจสอบเครือข่ายของคุณ\n" +
+      "Vui lòng kiểm tra mạng của bạn.\n" +
+      "網路中斷，請檢查網路"
+    );
 });
 
 // 當網路恢復時（可選）
 window.addEventListener("online", function() {
-    console.log("網路已恢復");
+    console.log(
+      "ระบบเครือข่ายกลับมาใช้งานได้แล้ว\n" +
+      "Mạng đã được khôi phục.\n" +
+      "網路已恢復"
+    );
 });
 
 
@@ -742,7 +754,11 @@ database.ref("systemVersion").on("value", snap => {
   if (serverVersion && serverVersion !== localVersion) {
     localStorage.setItem("app_version", serverVersion);
 
-    alert("系統已更新，重新載入");
+    alert(
+  "ระบบได้รับการอัปเดตและกำลังโหลดข้อมูลใหม่\n" +
+  "Hệ thống đã được cập nhật và đang được tải lại.\n" +
+  "系統已更新，重新載入"
+);
     location.reload();
   }
 });
@@ -759,7 +775,9 @@ let disconnectTimer = null;
 firebase.database().ref(".info/connected")
 .on("value", function(snap){
     if(snap.val() === true){
-        console.log("已連線");
+        console.log("ระบบเครือข่ายกลับมาใช้งานได้แล้ว\n" +
+      "Mạng đã được khôi phục.\n" +
+      "網路已恢復");
         // 連線恢復 → 清除計時器
         if(disconnectTimer){
             clearTimeout(disconnectTimer);
@@ -769,7 +787,11 @@ firebase.database().ref(".info/connected")
         // 斷線時，5 秒後才 alert
         if(!disconnectTimer){
             disconnectTimer = setTimeout(()=>{
-                alert("雲端資料連結中...");
+                alert(
+  "กำลังเชื่อมต่อข้อมูลผ่านระบบคลาวด์...\n" +
+  "Đang tiến hành kết nối dữ liệu đám mây...\n" +
+  "雲端資料連結中..."
+);
                 console.warn("Firebase disconnected");
             }, 5000);
         }
@@ -913,11 +935,14 @@ if (el) {
     if (selected && selected !== locKey) {
 const fruit = data.locations[selected];  // ⭐ 補這行
         const ok = confirm(
-          `เคลื่อนไหว_di chuyển_確定搬移？\n\n` +
-          `治具：${fruit}\n` +
-          `從：${selected}\n` +
-          `移到 ：${locKey}`
-        );
+  "เคลื่อนไหว？\n" +
+  "di chuyển？\n" +
+  "確定搬移？\n\n" +
+
+  `治具 / khuôn / เชื้อรา：${fruit}\n` +
+  `從   / Từ   / จาก：${selected}\n` +
+  `移到 / đến  / มาถึง：${locKey}`
+);
         if (!ok) {
     selected = null;   // ⭐ 清掉選取
     hasMoved = false;  // ⭐ 重置狀態
@@ -1453,7 +1478,11 @@ function doSearch() {
 if (nav) nav.classList.remove('hidden');
 
 } else {
-  alert('查無治具');
+alert(
+  "ไม่พบ\n" +
+  "Không tìm thấy\n" +
+  "查無治具"
+);
 
   // ⭐ 隱藏上下按鈕
   if (nav) nav.classList.add('hidden');
