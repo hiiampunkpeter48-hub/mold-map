@@ -531,15 +531,16 @@ header {
   <small>畫面移至頂端</small>
 </button>
   <button onclick="openRoomSelector()">
-  🏭 เครื่องจักร_máy móc<br>
+  🏭 เครื่องจักร<br>
+máy móc<br>
   <small>選取機台</small>
 </button>
   <button onclick="openBoxSelector()">
-  📦 พื้นที่_khu vực<br>
+  📦 พื้นที่ / khu vực<br>
   <small>選取治具區</small>
 </button>
   <button onclick="scrollBottomPage()">
-⬇ ด้านล่าง_đáy<br>
+⬇ ด้านล่าง / đáy<br>
   <small>畫面移至底部</small>
 </button>
 </div>
@@ -999,9 +1000,12 @@ function userLogin() {
 updateLoginButtonEffect();
   lastActivity = Date.now();
 
-  alert(`${currentUser} เข้าสู่ระบบแล้ว\n' +
-'Đã đăng nhập\n' +
-'已登入`);
+alert(
+  `${currentUser}\n` +
+  "เข้าสู่ระบบแล้ว\n" +
+  "Đã đăng nhập\n" +
+  "已登入"
+);
 
   const btn = document.getElementById('userLoginBtn');
 
@@ -1019,7 +1023,13 @@ function userLogout() {
 
   if (!currentUser) return;
 
-  alert(`${currentUser} ออกจากระบบ_Đăng xuất_已登出`);
+alert(
+  `${currentUser}\n` +
+  "ออกจากระบบ\n" +
+  "Đăng xuất\n" +
+  "已登出"
+);
+
 
   currentUser = null;
 updateLoginButtonEffect();
