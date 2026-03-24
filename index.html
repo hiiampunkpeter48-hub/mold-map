@@ -316,7 +316,7 @@ margin-top: 6px;   /* 和上方區塊間距 */
 
 body {
   margin: 10px;
-  padding-bottom: 150px;
+  padding-bottom: 50px;
   font-family: Arial, sans-serif;
   background: #cccccc;
 }
@@ -342,10 +342,10 @@ input, button, select { padding: 8px; font-size: 16px; }
 .log {
   background: #111;
   padding: 10px;
-  height: 440px;
+  height: 480px;
   width: 680px;
   overflow: auto;
-  font-size: 18px;
+  font-size: 12px;
   font-family: monospace;
 }
 
@@ -552,7 +552,7 @@ header {
 <div class="log" id="log" translate="no"></div>
 
 <button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
-    
+
 <script>
 
 window.onerror = function(msg, url, line, col, error){
@@ -2004,6 +2004,7 @@ function renderLog(){
   // ❌ 不要自動滾動 → 保持原本位置
   // logDiv.scrollTop = logDiv.scrollHeight;
 }
+
 
 </script>
 </body>
