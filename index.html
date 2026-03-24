@@ -125,10 +125,8 @@
 
 
 #adminToggleBtn {
-  position: fixed;
   bottom: 10px;
   right: 10px;   /* left 或 right: 10px */
-  z-index: 100000;
 }
 
 /* ===== 管理員懸浮按鈕 ===== */
@@ -344,10 +342,10 @@ input, button, select { padding: 8px; font-size: 16px; }
 .log {
   background: #111;
   padding: 10px;
-  height: 400px;
+  height: 440px;
   width: 680px;
   overflow: auto;
-  font-size: 24px;
+  font-size: 18px;
   font-family: monospace;
 }
 
@@ -552,8 +550,6 @@ header {
 
 <!-- 搬移記錄放這裡翻譯不要動 log -->
 <div class="log" id="log" translate="no"></div>
-
-<button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
 
 <script>
 
@@ -2008,7 +2004,7 @@ function renderLog(){
   // logDiv.scrollTop = logDiv.scrollHeight;
 }
 
-
+<button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
 </script>
 </body>
 </html>
