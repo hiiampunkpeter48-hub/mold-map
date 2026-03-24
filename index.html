@@ -939,7 +939,9 @@ const fruit = data.locations[selected];  // ⭐ 補這行
   "di chuyển？\n" +
   "確定搬移？\n\n" +
 
-  `治具 / khuôn / เชื้อรา：${fruit}\n` +
+  `治具 / khuôn / เชื้อรา：\n' +
+'${fruit}\n\n` +
+
   `從   / Từ   / จาก：${selected}\n` +
   `移到 / đến  / มาถึง：${locKey}`
 );
@@ -997,7 +999,9 @@ function userLogin() {
 updateLoginButtonEffect();
   lastActivity = Date.now();
 
-  alert(`${currentUser} เข้าสู่ระบบแล้ว_Đã đăng nhập_已登入`);
+  alert(`${currentUser} เข้าสู่ระบบแล้ว\n' +
+'Đã đăng nhập\n' +
+'已登入`);
 
   const btn = document.getElementById('userLoginBtn');
 
