@@ -125,7 +125,7 @@
 
 
 #adminToggleBtn {
-  bottom: 10px;
+  bottom: 1px;
   right: 10px;   /* left 或 right: 10px */
 }
 
@@ -532,7 +532,7 @@ header {
 </button>
   <button onclick="openRoomSelector()">
   🏭 เครื่องจักร<br>
-máy móc<br>
+        máy móc<br>
   <small>選取機台</small>
 </button>
   <button onclick="openBoxSelector()">
@@ -1263,7 +1263,6 @@ function createSelector(title, items, prefixText) {
     const btn = document.createElement('button');
     btn.textContent = name;
     btn.style.display = 'block';
-    btn.style.width = '100%';
     btn.style.margin = '5px 0';
 
     btn.onclick = () => {
