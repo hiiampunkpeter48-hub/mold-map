@@ -1254,8 +1254,6 @@ function createSelector(title, items, prefixText) {
   box.style.maxHeight = '70vh';
   box.style.overflowY = 'auto';
   box.style.minWidth = '180px';
-btn.style.width = '100%';
-btn.style.margin = '4px 0';
 
 
   const h = document.createElement('h3');
@@ -1267,6 +1265,7 @@ btn.style.margin = '4px 0';
     btn.textContent = name;
     btn.style.display = 'block';
     btn.style.margin = '5px 0';
+btn.style.width = '100%';
 
     btn.onclick = () => {
       const el = [...document.querySelectorAll('h3')]
