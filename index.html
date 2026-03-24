@@ -534,9 +534,10 @@ header {
 <div id="adminMenu" class="floatingMenu hidden">
   <button onclick="addFruit()">新增治具</button>
   <button onclick="removeFruit()">刪除治具</button>
-  <button onclick="editNames()">編輯名稱</button>
-  <button onclick="exportBackup()">匯出</button>
-  <button onclick="importBackup()">匯入</button>
+  <button onclick="renameFruit()">修改治具名稱</button>
+  <button onclick="editNames()">編輯R.T.B.B名稱</button>
+  <button onclick="exportBackup()">匯出localStorage + log</button>
+  <button onclick="importBackup()">匯入localStorage + log</button>
   <button onclick="safeme()">安全初始化</button>
 </div>
 
@@ -1602,6 +1603,55 @@ function removeFruit() {
   safeInit();
 render();
 }
+
+
+/* ====== 修改治具名稱 ====== */
+function renameFruit() {
+  if (!isAdmin) return alert('請先登入管理員');
+
+  // ⭐ 優先用目前選取的
+  let oldName = null;
+
+  if (selected) {
+    oldName = data.locations[selected];
+    if (!oldName) return alert('此格沒有治具');
+  } else {
+    oldName = prompt('輸入要修改的治具名稱');
+    if (!oldName) return;
+  }
+
+  if (!data.fruits.includes(oldName)) {
+    return alert('治具不存在');
+  }
+
+  const newName = prompt(`將「${oldName}」改為：`);
+  if (!newName) return;
+
+  if (data.fruits.includes(newName)) {
+    return alert('新名稱已存在');
+  }
+
+  // ⭐ 更新 fruits 清單
+  data.fruits = data.fruits.map(f => f === oldName ? newName : f);
+
+  // ⭐ 更新所有位置
+  Object.keys(data.locations).forEach(k => {
+    if (data.locations[k] === oldName) {
+      data.locations[k] = newName;
+    }
+  });
+
+  // ⭐ log 紀錄
+  data.log.unshift(
+    `${new Date().toLocaleString()} | 治具改名 ${oldName} → ${newName} | 操作者: 管理員`
+  );
+
+  save();
+  render();
+
+  alert('修改完成');
+}
+
 
 // ====== 匯出完整備份 (位置 + log) ======
 function exportBackup() {
