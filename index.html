@@ -207,7 +207,7 @@
 .boxes.W區 h3 { background-color: #ce93d8; } /* W：淺紫 */
 .boxes.X區 h3 { background-color: #90caf9; } /* X：淺藍 */
 .boxes.Y區 h3 { background-color: #ff6b6b; } /* Y：淺紅 */
-.boxes.Z區 / 1F or 3F h3 { background-color: #ffa726; } /* Z：淺橘 */
+.boxes.Z區_1F_or_3F h3 { background-color: #ffa726; } /* Z：淺橘 */
 
 /* 螢幕太小-保險 */
 @media (max-width: 600px) {
@@ -708,7 +708,7 @@ rooms: {
   "Y41","Y42","Y43","Y44","Y45","Y46","Y47","Y48",
   "Y49","Y50","Y51","Y52","Y53","Y54","Y55","Y56",
   "Y57","Y58","Y59","Y60","Y61","Y62","Y63","Y64"],
-    "Z區 / 1F or 3F":[
+    "Z區_1F_or_3F":[
   "Z1","Z2","Z3","Z4","Z5","Z6","Z7","Z8",
   "Z9","Z10","Z11","Z12","Z13","Z14","Z15","Z16",
   "Z17","Z18","Z19","Z20","Z21","Z22","Z23","Z24",
@@ -1942,7 +1942,7 @@ function safeInit(){
   };
 
   const DEFAULT_BOXES = {
-    "Z區 / 1F or 3F":[
+    "Z區_1F_or_3F":[
       "Z1","Z2","Z3","Z4","Z5","Z6","Z7","Z8",
       "Z9","Z10","Z11","Z12","Z13","Z14","Z15","Z16",
       "Z17","Z18","Z19","Z20","Z21","Z22","Z23","Z24",
@@ -1958,7 +1958,7 @@ function safeInit(){
 
   const DEFAULT_BOX_ORDER = [
     "A區","B區","C區","D區","E區","F區",
-    "G區","H區","J區","W區","X區","Y區","Z區 / 1F or 3F"
+    "G區","H區","J區","W區","X區","Y區","Z區_1F_or_3F"
   ];
 
   // ========= ⭐ 補 rooms =========
@@ -2031,14 +2031,14 @@ function safeInit(){
   }
 
   // ⭐ 補 Z區
-  if(!data.boxes["Z區 / 1F or 3F"]){
-    data.boxes["Z區 / 1F or 3F"] = DEFAULT_BOXES["Z區 / 1F or 3F"];
+  if(!data.boxes["Z區_1F_or_3F"]){
+    data.boxes["Z區_1F_or_3F"] = DEFAULT_BOXES["Z區_1F_or_3F"];
     changed = true;
   }
 
   // ⭐ 補 Z1~Z64
-  const cells = data.boxes["Z區 / 1F or 3F"];
-  DEFAULT_BOXES["Z區 / 1F or 3F"].forEach(c=>{
+  const cells = data.boxes["Z區_1F_or_3F"];
+  DEFAULT_BOXES["Z區_1F_or_3F"].forEach(c=>{
     if(!cells.includes(c)){
       cells.push(c);
       changed = true;
