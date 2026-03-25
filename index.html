@@ -1892,7 +1892,7 @@ function editNames(){
 
 function safeInit(){
 
-  // ========= 基本欄位保護 =========
+  // ========= 基本欄位 =========
   if(!data.rooms) data.rooms = {};
   if(!data.boxes) data.boxes = {};
   if(!data.fruits) data.fruits = [];
@@ -1901,81 +1901,114 @@ function safeInit(){
   if(!data.roomOrder) data.roomOrder = [];
   if(!data.boxOrder) data.boxOrder = [];
 
-  // ========= 清理不存在的 =========
-  data.roomOrder = data.roomOrder.filter(r => data.rooms[r]);
-  data.boxOrder = data.boxOrder.filter(b => data.boxes[b]);
+  // ========= ⭐ 預設資料（核心） =========
+  const DEFAULT_ROOMS = {
+    "E266":["工作桌_1","工作桌_2"],
+    "E262":["工作桌_1","工作桌_2"],
+    "E276":["工作桌_1","工作桌_2"],
+    "E233":["工作桌_1","工作桌_2","工作桌_3"],
+    "E202":["工作桌_1","工作桌_2","工作桌_3"],
+    "E270":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E269":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E232":["工作桌_1","工作桌_2"],
+    "E225":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E238":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E243":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E231":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E225之1":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E272":["工作桌_1","工作桌_2","工作桌_3"],
+    "E234":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E259":["工作桌_1","工作桌_2","工作桌_3"],
+    "E237":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E273":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E248":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E250":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E260":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E249":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"],
+    "E251":["工作桌_1","工作桌_2","工作桌_3","工作桌_4"]
+  };
 
-  // ========= ⭐ 固定順序（你自己定義） =========
-  const DEFAULT_ROOM_ORDER = [
-    "E266","E262","E276","E233","E202","E270","E269","E232","E225","E238","E243","E231","E225之1","E272","E234",
-    "E259","E237","E273","E248","E250","E260","E249","E251"
-    // ...照你HTML順序
-  ];
+  const DEFAULT_BOXES = {
+    "Z區 / 1F or 3F":[
+      "Z1","Z2","Z3","Z4","Z5","Z6","Z7","Z8",
+      "Z9","Z10","Z11","Z12","Z13","Z14","Z15","Z16",
+      "Z17","Z18","Z19","Z20","Z21","Z22","Z23","Z24",
+      "Z25","Z26","Z27","Z28","Z29","Z30","Z31","Z32",
+      "Z33","Z34","Z35","Z36","Z37","Z38","Z39","Z40",
+      "Z41","Z42","Z43","Z44","Z45","Z46","Z47","Z48",
+      "Z49","Z50","Z51","Z52","Z53","Z54","Z55","Z56",
+      "Z57","Z58","Z59","Z60","Z61","Z62","Z63","Z64"
+    ]
+  };
+
+  const DEFAULT_ROOM_ORDER = Object.keys(DEFAULT_ROOMS);
 
   const DEFAULT_BOX_ORDER = [
     "A區","B區","C區","D區","E區","F區",
     "G區","H區","J區","W區","X區","Y區","Z區 / 1F or 3F"
   ];
 
-  // ========= ⭐ rooms 排序 =========
-  let newRoomOrder = DEFAULT_ROOM_ORDER.filter(r => data.rooms[r]);
-
-  Object.keys(data.rooms).forEach(r => {
-    if (!newRoomOrder.includes(r)) {
-      newRoomOrder.push(r);
+  // ========= ⭐ 補 rooms =========
+  Object.keys(DEFAULT_ROOMS).forEach(r=>{
+    if(!data.rooms[r]){
+      data.rooms[r] = DEFAULT_ROOMS[r];
     }
   });
 
-  data.roomOrder = newRoomOrder;
-
-  // ========= ⭐ boxes 排序 =========
-  let newBoxOrder = DEFAULT_BOX_ORDER.filter(b => data.boxes[b]);
-
-  Object.keys(data.boxes).forEach(b => {
-    if (!newBoxOrder.includes(b)) {
-      newBoxOrder.push(b);
+  // ========= ⭐ 補 boxes（重點） =========
+  Object.keys(DEFAULT_BOXES).forEach(b=>{
+    if(!data.boxes[b]){
+      data.boxes[b] = DEFAULT_BOXES[b];
     }
   });
 
-  data.boxOrder = newBoxOrder;
+  // ========= ⭐ 修正 order =========
+  data.roomOrder = DEFAULT_ROOM_ORDER.filter(r=>data.rooms[r]);
+  Object.keys(data.rooms).forEach(r=>{
+    if(!data.roomOrder.includes(r)) data.roomOrder.push(r);
+  });
 
-  // ========= 補齊 Room Table =========
-  data.roomOrder.forEach(room => {
-    if (!data.rooms[room]) return;
+  data.boxOrder = DEFAULT_BOX_ORDER.filter(b=>data.boxes[b]);
+  Object.keys(data.boxes).forEach(b=>{
+    if(!data.boxOrder.includes(b)) data.boxOrder.push(b);
+  });
 
-    data.rooms[room].forEach(table => {
+  // ========= ⭐ 補齊 locations =========
+  data.roomOrder.forEach(room=>{
+    data.rooms[room].forEach(table=>{
       const key = `${room}|${table}`;
-      if (!(key in data.locations)) {
+      if(!(key in data.locations)){
         data.locations[key] = null;
       }
     });
   });
 
-  // ========= 補齊 Box 小框 =========
-  Object.values(data.boxes).flat().forEach(boxCell=>{
-    if(!(boxCell in data.locations)){
-      data.locations[boxCell] = null;
+  Object.values(data.boxes).flat().forEach(cell=>{
+    if(!(cell in data.locations)){
+      data.locations[cell] = null;
     }
   });
 
-  // ========= 清理孤兒 =========
-  for(const loc in data.locations){
+  // ========= ⭐ 清理孤兒 =========
+  const valid = new Set();
 
-    const isTable = loc.includes('|');
+  data.roomOrder.forEach(room=>{
+    data.rooms[room].forEach(table=>{
+      valid.add(`${room}|${table}`);
+    });
+  });
 
-    if(isTable){
-      const [room, table] = loc.split('|');
-      if(!data.rooms[room] || !data.rooms[room].includes(table)){
-        delete data.locations[loc];
-      }
-    }else{
-      const allBoxCells = Object.values(data.boxes).flat();
-      if(!allBoxCells.includes(loc)){
-        delete data.locations[loc];
-      }
+  Object.values(data.boxes).flat().forEach(c=>valid.add(c));
+
+  Object.keys(data.locations).forEach(loc=>{
+    if(!valid.has(loc)){
+      delete data.locations[loc];
     }
-  }
+  });
+
 }
+
+
 
 
 // ================= 渲染 =================
