@@ -936,16 +936,16 @@ if (el) {
 // ⭐ 再處理搬移確認
     if (selected && selected !== locKey) {
 const fruit = data.locations[selected];  // ⭐ 補這行
-        const ok = confirm(
-  "เคลื่อนไหว？\n" +
-  "di chuyển？\n" +
-  "確定搬移？\n\n" +
+const ok = confirm(
+  `เคลื่อนไหว？
+di chuyển？
+確定搬移？
 
-  `治具 / khuôn / เชื้อรา：\n` +
-${fruit}\n\n` +
+治具 / khuôn / เชื้อรา：
+${fruit}
 
-  `從   / Từ   / จาก：${selected}\n` +
-  `移到 / đến  / มาถึง：${locKey}`
+從   / Từ   / จาก：${selected}
+移到 / đến  / มาถึง：${locKey}`
 );
         if (!ok) {
     selected = null;   // ⭐ 清掉選取
