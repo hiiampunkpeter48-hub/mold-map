@@ -125,7 +125,8 @@
 
 
 #adminToggleBtn {
-  bottom: 1px;
+position: fixed;
+  bottom: 0;
   right: 10px;   /* left 或 right: 10px */
 }
 
@@ -316,7 +317,7 @@ margin-top: 6px;   /* 和上方區塊間距 */
 
 body {
   margin: 10px;
-  padding-bottom: 50px;
+  /*padding-bottom: 50px;*/
   font-family: Arial, sans-serif;
   background: #cccccc;
 }
@@ -751,6 +752,7 @@ database.ref("systemData").on("value", function(snapshot){
   // ⭐ 如果有變動 → 寫回 Firebase（但要避免無限觸發）
   if(changed){
     console.log("資料已自動修復");
+
 
     database.ref("systemData").set(data);
     return; // ⭐ 很重要！避免重複 render + 無限迴圈
