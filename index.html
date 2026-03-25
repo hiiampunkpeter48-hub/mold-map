@@ -736,15 +736,28 @@ if (!Array.isArray(data.boxOrder) || !data.boxOrder.length) data.boxOrder = Obje
 ===================================================== */
 
 database.ref("systemData").on("value", function(snapshot){
-if(!snapshot.val()) return;
-    if(snapshot.exists()){
-        data = snapshot.val();
-        safeInit();
-        render();        
-    } else {
-        // 第一次初始化
-        save(); 
-    }
+
+  if(!snapshot.exists()){
+    // ⭐ 第一次初始化
+    save();
+    return;
+  }
+
+  data = snapshot.val() || {};
+
+  // ⭐ 修復資料
+  const changed = safeInit();
+
+  // ⭐ 如果有變動 → 寫回 Firebase（但要避免無限觸發）
+  if(changed){
+    console.log("資料已自動修復");
+
+    database.ref("systemData").set(data);
+    return; // ⭐ 很重要！避免重複 render + 無限迴圈
+  }
+
+  // ⭐ 正常渲染
+  render();
 });
 
 
@@ -2006,7 +2019,40 @@ function safeInit(){
     }
   });
 
+
+
+
+
+  let changed = false;
+
+  if(!data.boxes){
+    data.boxes = {};
+    changed = true;
+  }
+
+  // ⭐ 補 Z區
+  if(!data.boxes["Z區 / 1F or 3F"]){
+    data.boxes["Z區 / 1F or 3F"] = DEFAULT_BOXES["Z區 / 1F or 3F"];
+    changed = true;
+  }
+
+  // ⭐ 補 Z1~Z64
+  const cells = data.boxes["Z區 / 1F or 3F"];
+  DEFAULT_BOXES["Z區 / 1F or 3F"].forEach(c=>{
+    if(!cells.includes(c)){
+      cells.push(c);
+      changed = true;
+    }
+  });
+
+  return changed; // ⭐ 回傳是否有修改
 }
+
+
+
+
+
+
 
 
 
