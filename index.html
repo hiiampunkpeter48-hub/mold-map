@@ -1038,6 +1038,8 @@ function userLogout() {
 
   if (!currentUser) return;
 
+clearHighlight(); // ⭐ 新增：登出前清除搜尋
+
 alert(
   `${currentUser}\n` +
   "ออกจากระบบ\n" +
@@ -1100,11 +1102,24 @@ setInterval(() => {
   if (!currentUser && !isAdmin) return;
 
   if (Date.now() - lastActivity > AUTO_LOGOUT_MS) {
+
+clearHighlight(); // ⭐ 先清除搜尋
+
     alert('已超過 60 分鐘未操作，自動登出\n' +
           'ระบบจะล็อกเอาต์โดยอัตโนมัติใน 60 นาที\n' +
           'Tự động đăng xuất sau 60 phút');
     userLogout();
-    adminLogout();
+
+    // ⭐ 管理員額外處理（關閉工具）
+    if(isAdmin){
+      isAdmin = false;
+
+      document.getElementById('adminFloatingBtn').style.display = 'none';
+      document.getElementById('adminMenu').classList.add('hidden');
+
+      updateAdminButton();
+    }
+
   }
 }, 60 * 1000);
 
@@ -1387,6 +1402,9 @@ function toggleAdmin(){
 
   // ===== 已登入 → 登出 =====
   if(isAdmin){
+
+clearHighlight(); // ⭐ 新增
+
     isAdmin = false;
 
     alert('已登出管理員');
