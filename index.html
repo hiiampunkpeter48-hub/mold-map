@@ -1527,6 +1527,12 @@ clearHighlight(); // ⭐ 新增
   // ===== 未登入 → 登入 =====
 function askPassword(callback){
 
+input.addEventListener('keydown', function(e){
+  if(e.key === 'Enter'){
+    btn.click();
+  }
+});
+  
   const overlay = document.createElement('div');
   overlay.style.position = 'fixed';
   overlay.style.inset = '0';
@@ -1595,15 +1601,7 @@ askPassword(function(p){
 
 }
 
-
-input.addEventListener('keydown', function(e){
-  if(e.key === 'Enter'){
-    btn.click();
-  }
-});
-
-
-
+  
 
 function updateAdminButton(){
   const btn = document.getElementById('adminToggleBtn');
