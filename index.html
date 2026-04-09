@@ -15,6 +15,31 @@
 
 <style>
 
+
+/* ===== 無網路鎖畫面 ===== */
+#offlineOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 9999999; /* 比你所有東西都高 */
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+#offlineOverlay .box {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  font-size: 18px;
+  line-height: 1.6;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+
+
 /* ⭐ 按鈕背景流動 */
 @keyframes bgFlow {
   0%   { background-position: 0% 50%; }
@@ -587,6 +612,18 @@ header {
 
 <button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
 
+
+<div id="offlineOverlay">
+  <div class="box">
+    ⚠️ 無網路連線<br><br>
+    โปรดตรวจสอบเครือข่ายของคุณ<br>
+    Vui lòng kiểm tra mạng của bạn<br>
+    請檢查網路
+  </div>
+</div>
+
+
+
 <script>
 
 window.onerror = function(msg, url, line, col, error){
@@ -618,7 +655,8 @@ function safeme(){
 
 // 一開始就檢查網路狀態
 if (!navigator.onLine) {
-    alert(
+setOfflineUI(true); // ⭐ 加這行  
+  alert(
       "โปรดตรวจสอบเครือข่ายของคุณ\n" +
       "Vui lòng kiểm tra mạng của bạn.\n" +
       "裝置未連線，請檢查網路"
@@ -627,6 +665,7 @@ if (!navigator.onLine) {
 
 // 當網路斷開時
 window.addEventListener("offline", function() {
+setOfflineUI(true); // ⭐ 加這行
     alert(
       "โปรดตรวจสอบเครือข่ายของคุณ\n" +
       "Vui lòng kiểm tra mạng của bạn.\n" +
@@ -636,6 +675,7 @@ window.addEventListener("offline", function() {
 
 // 當網路恢復時（可選）
 window.addEventListener("online", function() {
+setOfflineUI(true); // ⭐ 加這行
     console.log(
       "ระบบเครือข่ายกลับมาใช้งานได้แล้ว\n" +
       "Mạng đã được khôi phục.\n" +
@@ -815,6 +855,9 @@ firebase.database().ref(".info/connected")
       "Mạng đã được khôi phục.\n" +
       "網路已恢復");
         // 連線恢復 → 清除計時器
+
+setOfflineUI(false); // ⭐ 線上
+
         if(disconnectTimer){
             clearTimeout(disconnectTimer);
             disconnectTimer = null;
@@ -823,6 +866,9 @@ firebase.database().ref(".info/connected")
         // 斷線時，5 秒後才 alert
         if(!disconnectTimer){
             disconnectTimer = setTimeout(()=>{
+
+setOfflineUI(true); // ⭐ 斷線鎖畫面
+
                 alert(
   "กำลังเชื่อมต่อข้อมูลผ่านระบบคลาวด์...\n" +
   "Đang tiến hành kết nối dữ liệu đám mây...\n" +
@@ -833,6 +879,33 @@ firebase.database().ref(".info/connected")
         }
     }
 });
+
+
+
+
+function setOfflineUI(isOffline){
+
+  const overlay = document.getElementById('offlineOverlay');
+
+  if(isOffline){
+    overlay.style.display = 'flex';
+
+    // ⭐ 禁止整個頁面操作
+    document.body.style.pointerEvents = 'none';
+
+    // ⭐ 但允許 overlay 自己可見
+    overlay.style.pointerEvents = 'auto';
+
+  }else{
+    overlay.style.display = 'none';
+
+    // ⭐ 恢復操作
+    document.body.style.pointerEvents = 'auto';
+  }
+}
+
+
+
 
 
 /* =====================================================
@@ -1452,7 +1525,55 @@ clearHighlight(); // ⭐ 新增
   }
 
   // ===== 未登入 → 登入 =====
-  const p = prompt('輸入管理員密碼');
+function askPassword(callback){
+
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.inset = '0';
+  overlay.style.background = 'rgba(0,0,0,.5)';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.zIndex = '100000';
+
+  const box = document.createElement('div');
+  box.style.background = 'white';
+  box.style.padding = '20px';
+  box.style.borderRadius = '10px';
+  box.style.minWidth = '250px';
+
+  const title = document.createElement('h3');
+  title.textContent = '輸入管理員密碼';
+  box.appendChild(title);
+
+  const input = document.createElement('input');
+  input.type = 'password'; // ⭐⭐ 關鍵：遮蔽
+  input.placeholder = '請輸入密碼';
+  input.style.width = '100%';
+  input.style.margin = '10px 0';
+  box.appendChild(input);
+
+  const btn = document.createElement('button');
+  btn.textContent = '確定';
+  btn.style.width = '100%';
+
+  btn.onclick = () => {
+    const val = input.value;
+    document.body.removeChild(overlay);
+    callback(val);
+  };
+
+  box.appendChild(btn);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  input.focus();
+}
+
+
+
+askPassword(function(p){
+
   if(!p) return;
 
   if(btoa(p) === ADMIN_HASH){
@@ -1461,7 +1582,6 @@ clearHighlight(); // ⭐ 新增
 
     alert('管理員登入成功');
 
-    // ⭐⭐ 這行是關鍵 ⭐⭐
     document.getElementById('adminFloatingBtn').style.display = 'flex';
 
     updateAdminButton();
@@ -1470,7 +1590,8 @@ clearHighlight(); // ⭐ 新增
   }else{
     alert('密碼錯誤');
   }
-}
+
+});
 
 
 
