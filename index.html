@@ -1527,12 +1527,6 @@ clearHighlight(); // ⭐ 新增
   // ===== 未登入 → 登入 =====
 function askPassword(callback){
 
-input.addEventListener('keydown', function(e){
-  if(e.key === 'Enter'){
-    btn.click();
-  }
-});
-  
   const overlay = document.createElement('div');
   overlay.style.position = 'fixed';
   overlay.style.inset = '0';
@@ -1562,6 +1556,14 @@ input.addEventListener('keydown', function(e){
   const btn = document.createElement('button');
   btn.textContent = '確定';
   btn.style.width = '100%';
+
+
+input.addEventListener('keydown', function(e){
+  if(e.key === 'Enter'){
+    btn.click();
+  }
+});
+
 
   btn.onclick = () => {
     const val = input.value;
@@ -1601,7 +1603,15 @@ askPassword(function(p){
 
 }
 
-  
+
+input.addEventListener('keydown', function(e){
+  if(e.key === 'Enter'){
+    btn.click();
+  }
+});
+
+
+
 
 function updateAdminButton(){
   const btn = document.getElementById('adminToggleBtn');
