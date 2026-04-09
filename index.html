@@ -1596,6 +1596,14 @@ askPassword(function(p){
 }
 
 
+input.addEventListener('keydown', function(e){
+  if(e.key === 'Enter'){
+    btn.click();
+  }
+});
+
+
+
 
 function updateAdminButton(){
   const btn = document.getElementById('adminToggleBtn');
