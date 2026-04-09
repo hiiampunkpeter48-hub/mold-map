@@ -611,6 +611,9 @@ header {
 <div class="log" id="log" translate="no"></div>
 
 
+<button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
+
+
 <div id="offlineOverlay">
   <div class="box">
     ⚠️ 無網路連線<br><br>
@@ -620,8 +623,6 @@ header {
   </div>
 </div>
 
-
-<button onclick="toggleAdmin()" id="adminToggleBtn">🔒管理員登入</button>
 
 <script>
 
@@ -674,7 +675,7 @@ setOfflineUI(true); // ⭐ 加這行
 
 // 當網路恢復時（可選）
 window.addEventListener("online", function() {
-setOfflineUI(true); // ⭐ 加這行
+setOfflineUI(false); // ✅ 應該要解除鎖定
     console.log(
       "ระบบเครือข่ายกลับมาใช้งานได้แล้ว\n" +
       "Mạng đã được khôi phục.\n" +
